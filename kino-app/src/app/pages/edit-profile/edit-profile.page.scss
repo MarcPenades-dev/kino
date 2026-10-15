@@ -1,0 +1,353 @@
+
+$naranja: #FF6D00;
+$naranja-hover: #E65C00;
+$naranja-light: rgba(255, 109, 0, 0.1);
+$fondo: #0A0A0A;
+$fondo-suave: #141414;
+$card: #1A1A1A;
+$borde: #2A2A2A;
+$borde-focus: #FF6D00;
+$blanco: #FFFFFF;
+$blanco-80: rgba(255, 255, 255, 0.8);
+$blanco-60: rgba(255, 255, 255, 0.6);
+$blanco-40: rgba(255, 255, 255, 0.4);
+$gris: #888888;
+$gris-oscuro: #666666;
+$rojo: #EB445A;
+$verde: #2DD36F;
+$azul: #3880FF;
+$transicion: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$sombra-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+$sombra-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+
+.edit-header {
+  ion-toolbar {
+    --background: #{$fondo};
+    --color: #{$blanco};
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .title-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $blanco;
+    letter-spacing: -0.3px;
+  }
+}
+
+.btn-cancel {
+  --color: #{$blanco-60};
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+
+  &:active {
+    --color: #{$naranja};
+  }
+}
+
+.btn-save {
+  --color: #{$naranja};
+  font-weight: 700;
+  font-size: 0.95rem;
+
+  .save-text {
+    color: $naranja;
+    transition: $transicion;
+  }
+
+  &:active {
+    .save-text {
+      color: $naranja-hover;
+    }
+  }
+}
+
+
+.edit-content {
+  --background: #{$fondo};
+  --padding-top: 0;
+}
+
+
+.photo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 24px;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba($naranja, 0.2),
+        transparent
+    );
+  }
+}
+
+.photo-container {
+  margin-bottom: 14px;
+}
+
+.photo-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: $card;
+  border: 3px solid rgba($naranja, 0.3);
+  transition: $transicion;
+
+  .profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-initial {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: $naranja;
+    background: rgba($naranja, 0.08);
+    letter-spacing: -1px;
+  }
+
+  .photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: $transicion;
+
+    .camera-icon {
+      font-size: 1.5rem;
+      color: $blanco;
+    }
+  }
+
+  &:hover {
+    border-color: $naranja;
+
+    .photo-overlay {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.btn-change-photo {
+  background: transparent;
+  border: none;
+  color: $naranja;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: $transicion;
+
+  ion-icon {
+    font-size: 1rem;
+  }
+
+  &:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+
+.form-container {
+  padding: 24px 20px 20px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: $naranja;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.label-with-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field-wrapper {
+  display: flex;
+  align-items: center;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 12px;
+  padding: 14px 16px;
+  gap: 12px;
+  transition: $transicion;
+
+  &:focus-within {
+    border-color: $naranja;
+    box-shadow: 0 0 0 3px rgba($naranja, 0.1);
+    background: rgba($naranja, 0.02);
+  }
+
+  &.has-error {
+    border-color: $rojo;
+    box-shadow: 0 0 0 3px rgba($rojo, 0.1);
+  }
+}
+
+.field-icon {
+  font-size: 1.2rem;
+  color: $gris-oscuro;
+  flex-shrink: 0;
+  transition: $transicion;
+
+  .field-wrapper:focus-within & {
+    color: $naranja;
+  }
+}
+
+.field-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: $gris;
+    font-weight: 400;
+  }
+
+  &.textarea {
+    resize: vertical;
+    min-height: 120px;
+    padding: 0;
+  }
+}
+
+.textarea-wrapper {
+  align-items: flex-start;
+  padding-top: 12px;
+}
+
+.char-counter {
+  font-size: 0.78rem;
+  color: $gris;
+  font-weight: 600;
+  transition: $transicion;
+
+  &.warning {
+    color: $naranja;
+  }
+}
+
+.field-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: $blanco-40;
+
+  ion-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: $gris-oscuro;
+  }
+
+  &.warning {
+    color: $naranja;
+
+    ion-icon {
+      color: $naranja;
+    }
+  }
+
+  &.error {
+    color: $rojo;
+
+    ion-icon {
+      color: $rojo;
+    }
+  }
+}
+
+
+.bottom-spacer {
+  height: 100px;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-section {
+  animation: fadeIn 0.3s ease-out both;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}

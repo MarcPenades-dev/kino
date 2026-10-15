@@ -1,0 +1,199 @@
+<ion-content class="detail-content">
+
+  <div class="hero-wrap">
+    <div class="hero-bg">
+
+      <!-- Carrusel: varias imágenes -->
+      <ng-container *ngIf="getImagenes().length > 0">
+        <img
+          *ngFor="let img of getImagenes(); let i = index"
+          [src]="img"
+          class="hero-img carrusel-slide"
+          [class.activa]="slideActual === i"
+        />
+      </ng-container>
+
+      <!-- Sin imagen -->
+      <div *ngIf="getImagenes().length === 0" class="hero-placeholder"></div>
+
+      <div class="hero-gradient"></div>
+
+      <!-- Dots (solo si hay varias) -->
+      <div class="hero-dots" *ngIf="getImagenes().length > 1">
+        <span
+          class="hero-dot"
+          *ngFor="let img of getImagenes(); let i = index"
+          [class.activo]="slideActual === i"
+          (click)="slideActual = i">
+        </span>
+      </div>
+    </div>
+
+    <div class="hero-toolbar">
+      <button class="btn-back" (click)="volver()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <div class="hero-toolbar-actions">
+        <button
+          class="btn-save"
+          [class.guardado]="estaGuardado"
+          (click)="toggleGuardar()"
+        >
+          <ion-icon [name]="estaGuardado ? 'heart' : 'heart-outline'"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-badges">
+      <span class="badge-new">NEW</span>
+      <span class="badge-rol" *ngFor="let g of getGeneros()">{{ g }}</span>
+    </div>
+
+    <div class="hero-bottom">
+      <h1 class="hero-titulo">{{ guion?.titulo }}</h1>
+      <p class="hero-director">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        Dir. {{ guion?.guionista?.nombre || 'Unknown' }}
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="centrado">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div class="body" *ngIf="!cargando && guion">
+
+    <div class="meta-row">
+      <div class="meta-chip" *ngIf="guion.ubicacion">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ guion.ubicacion }}</span>
+      </div>
+      <div class="meta-chip" *ngIf="guion.edades">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ guion.edades }}</span>
+      </div>
+      <div class="meta-chip pago" *ngIf="guion.contacto">
+        <ion-icon name="cash-outline"></ion-icon>
+        <span>{{ guion.contacto }}</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="seccion">
+      <h2 class="seccion-titulo">Sinopsis</h2>
+      <p class="sinopsis-texto">{{ guion.sinopsis }}</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="seccion" *ngIf="guion.requisitos?.length > 0">
+      <h2 class="seccion-titulo">Requisitos de Audición</h2>
+      <div class="requisitos-lista">
+        <div class="requisito-item" *ngFor="let r of guion.requisitos">
+          <ion-icon name="checkmark-circle-outline" class="req-icon"></ion-icon>
+          <span>{{ r }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" *ngIf="guion.requisitos?.length > 0"></div>
+
+    <div class="seccion">
+      <h2 class="seccion-titulo">Sobre el Director</h2>
+      <div class="director-card" (click)="verPerfilDirector()">
+        <div class="director-avatar">
+          <img *ngIf="guion.guionista?.foto"
+               [src]="getImgUrl(guion.guionista.foto)" />
+          <div *ngIf="!guion.guionista?.foto" class="director-inicial">
+            {{ getInitial(guion.guionista?.nombre) }}
+          </div>
+        </div>
+        <div class="director-info">
+          <p class="director-nombre">{{ guion.guionista?.nombre || 'Director' }}</p>
+          <span class="director-rol">Casting Director</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="director-arrow"></ion-icon>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="seccion">
+      <h2 class="seccion-titulo">
+        Comentarios
+        <span class="count">({{ guion?.comentarios?.length || 0 }})</span>
+      </h2>
+
+      <div class="comentario-item" *ngFor="let c of guion?.comentarios">
+        <div class="comentario-avatar">{{ getInitial(c?.usuario?.nombre) }}</div>
+        <div class="comentario-body">
+          <div class="comentario-header">
+            <span class="comentario-autor">{{ c?.usuario?.nombre || 'Usuario' }}</span>
+            <span class="comentario-fecha">{{ c?.fecha | date:'shortDate' }}</span>
+          </div>
+          <p class="comentario-texto">{{ c?.texto }}</p>
+        </div>
+      </div>
+
+      <p class="sin-comentarios" *ngIf="!guion?.comentarios?.length">
+        Sé el primero en comentar.
+      </p>
+
+      <div class="comentar-wrap">
+        <input
+          type="text"
+          [(ngModel)]="nuevoComentario"
+          placeholder="Escribe un comentario..."
+          class="input-comentario"
+          (keyup.enter)="enviarComentario()"
+        />
+        <button
+          class="btn-enviar"
+          [disabled]="!nuevoComentario.trim() || enviandoComentario"
+          (click)="enviarComentario()"
+        >
+          <ion-icon name="send"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="pdf-wrap" *ngIf="guion.pdfUrl">
+      <button class="btn-pdf" (click)="abrirPdf()">
+        <ion-icon name="document-text-outline"></ion-icon>
+        Descargar Guión
+      </button>
+    </div>
+
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<ion-footer class="ion-no-border detail-footer" *ngIf="!cargando && guion && esActor">
+
+  <div class="footer-aplicado" *ngIf="yaAplico">
+    <div class="aplicado-badge">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <span>Solicitud Enviada</span>
+    </div>
+    <button class="btn-aplicado-ver" (click)="verAplicaciones()">
+      Ver Mis Solicitudes →
+    </button>
+  </div>
+
+  <button
+    class="btn-apply"
+    *ngIf="!yaAplico"
+    (click)="aplicar()"
+    [disabled]="aplicando"
+  >
+    <ion-spinner *ngIf="aplicando" name="crescent" color="light"></ion-spinner>
+    <span *ngIf="!aplicando">
+      <ion-icon name="paper-plane-outline"></ion-icon>
+      Aplicar Ahora
+    </span>
+  </button>
+
+</ion-footer>

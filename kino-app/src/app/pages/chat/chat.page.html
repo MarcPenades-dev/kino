@@ -1,0 +1,274 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <div class="chat-header-info" (click)="verPerfil()">
+      <div class="chat-avatar-wrap">
+        <img *ngIf="otroUsuario?.foto"
+             [src]="getImgUrl(otroUsuario.foto)"
+             class="chat-avatar-img" />
+        <div *ngIf="!otroUsuario?.foto" class="chat-avatar-inicial">
+          {{ getInitial(otroUsuario?.nombre) }}
+        </div>
+        <div class="chat-online-dot"></div>
+      </div>
+      <div class="chat-header-text">
+        <h3 class="chat-nombre">{{ otroUsuario?.nombre || 'Usuario' }}</h3>
+        <p class="chat-sub">{{ scriptTitulo }}</p>
+      </div>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSelectorFondo()" class="btn-fondo">
+        <ion-icon name="color-palette-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="iniciarVideo()" class="btn-video">
+        <ion-icon name="videocam-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="verPerfil()" class="btn-info">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<div class="fondo-chat-selector" *ngIf="mostrarSelectorFondoChat">
+  <p class="fondo-selector-titulo">Fondo del chat</p>
+  <div class="fondo-chat-options">
+    <div
+      class="fondo-chat-option"
+      *ngFor="let f of fondosChat"
+      [style.background-image]="f.img ? 'url(' + f.img + ')' : null"
+      [style.background]="!f.img ? f.css : null"
+      [class.activo]="fondoChatActual.id === f.id"
+      (click)="seleccionarFondoChat(f)"
+    >
+      <ion-icon name="checkmark-outline" *ngIf="fondoChatActual.id === f.id"></ion-icon>
+      <span class="fondo-option-label">{{ f.label }}</span>
+    </div>
+  </div>
+</div>
+
+<ion-content
+  class="chat-content"
+  #chatContent
+  scrollEvents="true"
+  [style.--background]="fondoChatActual.img ? 'url(' + fondoChatActual.img + ') center/cover no-repeat' : fondoChatActual.css"
+>
+
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div class="chat-perfil-info" *ngIf="!cargando && otroUsuario">
+    <div class="perfil-avatar-grande">
+      <img *ngIf="otroUsuario?.foto"
+           [src]="getImgUrl(otroUsuario.foto)" />
+      <div *ngIf="!otroUsuario?.foto" class="perfil-inicial-grande">
+        {{ getInitial(otroUsuario?.nombre) }}
+      </div>
+    </div>
+    <h3 class="perfil-nombre">{{ otroUsuario?.nombre }}</h3>
+    <p class="perfil-sub">KINO · Casting App</p>
+    <button class="btn-ver-perfil" (click)="verPerfil()">Ver perfil</button>
+  </div>
+
+  <div class="chat-empty" *ngIf="!cargando && mensajes.length === 0">
+    <p class="chat-empty-text">No hay mensajes aún. ¡Di hola! 👋</p>
+  </div>
+
+  <div class="menu-overlay" *ngIf="accionesAbiertas" (click)="cerrarMenu()"></div>
+
+  <div class="mensajes-lista" *ngIf="!cargando">
+    <div
+      class="mensaje-grupo"
+      *ngFor="let m of mensajes; let i = index"
+      [class.propio]="esMio(m)"
+      [class.otro]="!esMio(m)"
+    >
+      <div class="msg-avatar-wrap" *ngIf="!esMio(m)">
+        <img *ngIf="otroUsuario?.foto && esUltimoDeSuGrupo(i)"
+             [src]="getImgUrl(otroUsuario.foto)"
+             class="msg-avatar" />
+        <div *ngIf="!otroUsuario?.foto && esUltimoDeSuGrupo(i)"
+             class="msg-avatar-inicial">
+          {{ getInitial(otroUsuario?.nombre) }}
+        </div>
+        <div *ngIf="!esUltimoDeSuGrupo(i)" class="msg-avatar-space"></div>
+      </div>
+
+      <div class="msg-bubble-wrap">
+        <div
+          class="msg-bubble"
+          [class.editando]="mensajeEditando?._id === m._id"
+          [class.seleccionado]="accionesAbiertas === m._id"
+        >
+          <p class="msg-texto"
+             *ngIf="!m.audioUrl && !m.imagenUrl && mensajeEditando?._id !== m._id">
+            {{ m.texto }}
+            <span class="msg-editado" *ngIf="m.editado"> · editado</span>
+          </p>
+
+          <div class="msg-imagen-wrap" *ngIf="m.imagenUrl">
+            <img [src]="m.imagenUrl" class="msg-imagen" (click)="abrirImagen(m.imagenUrl)" />
+          </div>
+
+          <div class="edit-input-wrap" *ngIf="mensajeEditando?._id === m._id">
+            <input
+              type="text"
+              [(ngModel)]="textoEditando"
+              class="edit-input"
+              (keyup.enter)="guardarEdicion()"
+              (keyup.escape)="cancelarEdicion()"
+            />
+            <div class="edit-actions">
+              <button class="edit-btn cancel" (click)="cancelarEdicion()">
+                Cancelar
+              </button>
+              <button class="edit-btn save" (click)="guardarEdicion()">
+                Guardar
+              </button>
+            </div>
+          </div>
+
+          <div class="audio-mensaje" *ngIf="m.audioUrl">
+            <button class="btn-play-audio"
+                    (click)="toggleAudio(m)"
+                    [class.playing]="audioActual === m._id">
+              <ion-icon [name]="audioActual === m._id ? 'pause-outline' : 'play-outline'"></ion-icon>
+            </button>
+            <div class="audio-barra">
+              <div class="audio-progress"
+                   [style.width.%]="audioActual === m._id ? audioProgreso : 0">
+              </div>
+            </div>
+            <span class="audio-duracion">{{ m.duracion || '0:00' }}</span>
+          </div>
+        </div>
+
+        <button
+          class="btn-mas-opciones"
+          *ngIf="esMio(m) && mensajeEditando?._id !== m._id"
+          (click)="toggleAcciones(m, $event)"
+        >
+          <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+        </button>
+
+        <div class="msg-acciones" *ngIf="accionesAbiertas === m._id && esMio(m)">
+          <button class="msg-accion-btn editar" (click)="iniciarEdicion(m)">
+            <ion-icon name="create-outline"></ion-icon>
+            <span>Editar</span>
+          </button>
+          <button class="msg-accion-btn eliminar" (click)="confirmarEliminar(m)">
+            <ion-icon name="trash-outline"></ion-icon>
+            <span>Eliminar</span>
+          </button>
+        </div>
+
+        <span class="msg-hora" *ngIf="esUltimoDeSuGrupo(i)">
+          {{ m.createdAt | date:'HH:mm' }}
+        </span>
+
+        <div class="msg-visto" *ngIf="esMio(m) && esUltimoLeidoPorOtro(m, i)">
+          <img *ngIf="otroUsuario?.foto"
+               [src]="getImgUrl(otroUsuario.foto)"
+               class="visto-avatar" />
+          <div *ngIf="!otroUsuario?.foto" class="visto-avatar-inicial">
+            {{ getInitial(otroUsuario?.nombre) }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 16px;"></div>
+</ion-content>
+
+<div class="video-modal" *ngIf="videollamadaActiva">
+  <div class="video-header">
+    <button class="btn-cerrar-video" (click)="cerrarVideo()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+    <span>Videollamada · {{ otroUsuario?.nombre }}</span>
+    <div class="video-header-spacer"></div>
+  </div>
+  <iframe
+    [src]="videoUrl"
+    allow="camera; microphone; fullscreen; display-capture; autoplay"
+    allowfullscreen
+    class="video-iframe"
+  ></iframe>
+</div>
+
+<ion-footer class="ion-no-border chat-footer">
+  <div class="chat-input-container">
+
+    <button class="btn-media" (click)="seleccionarImagen()">
+      <ion-icon name="camera-outline"></ion-icon>
+    </button>
+    <input type="file" #imgInput accept="image/*" style="display:none"
+           (change)="onImageSelected($event)" />
+
+    <div class="input-wrap" [class.tiene-texto]="nuevoMensaje.trim()">
+      <input
+        type="text"
+        [(ngModel)]="nuevoMensaje"
+        placeholder="Mensaje..."
+        class="chat-input"
+        (keyup.enter)="enviar()"
+        *ngIf="!grabando"
+      />
+
+      <div class="grabando-wrap" *ngIf="grabando">
+        <div class="grabando-dot"></div>
+        <span class="grabando-texto">{{ formatTiempo(tiempoGrabacion) }}</span>
+        <div class="grabando-olas">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="emojis-rapidos" *ngIf="!nuevoMensaje.trim() && !grabando">
+        <button class="emoji-btn" (click)="enviarEmoji('❤️')">❤️</button>
+        <button class="emoji-btn" (click)="enviarEmoji('👏')">👏</button>
+        <button class="emoji-btn" (click)="enviarEmoji('🎬')">🎬</button>
+      </div>
+    </div>
+
+    <button class="btn-send"
+            *ngIf="nuevoMensaje.trim() && !grabando"
+            (click)="enviar()"
+            [disabled]="enviando">
+      Enviar
+    </button>
+
+    <button class="btn-cancel-audio" *ngIf="grabando" (click)="cancelarAudio()">
+      <ion-icon name="trash-outline"></ion-icon>
+    </button>
+
+    <div class="btns-media" *ngIf="!nuevoMensaje.trim() && !grabando">
+      <button class="btn-media"
+              (mousedown)="iniciarGrabacion()"
+              (mouseup)="detenerGrabacion()"
+              (touchstart)="iniciarGrabacion()"
+              (touchend)="detenerGrabacion()">
+        <ion-icon name="mic-outline"></ion-icon>
+      </button>
+      <button class="btn-media" (click)="seleccionarImagen()">
+        <ion-icon name="image-outline"></ion-icon>
+      </button>
+      <button class="btn-media">
+        <ion-icon name="happy-outline"></ion-icon>
+      </button>
+    </div>
+
+    <button class="btn-send-audio" *ngIf="grabando" (click)="detenerGrabacion()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+
+  </div>
+</ion-footer>

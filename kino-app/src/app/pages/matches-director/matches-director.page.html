@@ -1,0 +1,169 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Matches</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAChats()">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-header">
+    <h1 class="page-titulo">Solicitudes</h1>
+    <p class="page-sub">Actores interesados en tus castings</p>
+  </div>
+
+  <div class="filtro-tabs">
+    <button class="filtro-btn" [class.activo]="filtroActual === 'pendiente'" (click)="filtroActual = 'pendiente'">
+      Pendiente
+      <span class="filtro-count" *ngIf="pendientes.length > 0">{{ pendientes.length }}</span>
+    </button>
+    <button class="filtro-btn" [class.activo]="filtroActual === 'aceptado'" (click)="filtroActual = 'aceptado'">
+      Aceptado
+      <span class="filtro-count aceptados" *ngIf="aceptados.length > 0">{{ aceptados.length }}</span>
+    </button>
+  </div>
+
+  <div *ngIf="cargando" class="centrado">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <!-- ═══ PENDIENTES ═══ -->
+  <div class="grupos-lista" *ngIf="!cargando && filtroActual === 'pendiente'">
+
+    <div *ngIf="gruposPendientes.length === 0" class="empty-state">
+      <ion-icon name="people-outline" class="empty-icon"></ion-icon>
+      <p class="empty-titulo">Sin solicitudes pendientes</p>
+      <p class="empty-sub">Cuando un actor muestre interés en tu casting aparecerá aquí.</p>
+    </div>
+
+    <div class="grupo-card" *ngFor="let grupo of gruposPendientes">
+
+      <!-- Cabecera: actor -->
+      <div class="grupo-header" (click)="toggleGrupo(grupo)">
+        <div class="match-avatar">
+          <img *ngIf="grupo.actor?.foto" [src]="getImgUrl(grupo.actor.foto)" />
+          <div *ngIf="!grupo.actor?.foto" class="avatar-inicial">{{ getInitial(grupo.actor?.nombre) }}</div>
+        </div>
+        <div class="grupo-info">
+          <div class="grupo-row-top">
+            <h3 class="grupo-nombre">
+              {{ grupo.actor?.nombre || 'Actor' }}
+              <span class="match-edad" *ngIf="grupo.actor?.edad">, {{ grupo.actor.edad }}</span>
+            </h3>
+            <ion-icon
+              *ngIf="grupo.matches.length > 1"
+              [name]="grupo.expandido ? 'chevron-down-outline' : 'chevron-forward-outline'"
+              class="grupo-chevron">
+            </ion-icon>
+          </div>
+          <p class="grupo-ubicacion" *ngIf="grupo.actor?.ciudad">
+            <ion-icon name="location-outline"></ion-icon> {{ grupo.actor.ciudad }}
+          </p>
+          <p class="grupo-subtitulo" *ngIf="grupo.matches.length > 1">
+            <ion-icon name="film-outline"></ion-icon>
+            Interesado en {{ grupo.matches.length }} castings
+          </p>
+        </div>
+      </div>
+
+      <!-- Lista de castings del actor -->
+      <div class="castings-lista"
+           [class.siempre-visible]="grupo.matches.length === 1"
+           [class.expandido]="grupo.matches.length > 1 && grupo.expandido">
+
+        <div class="casting-match-row" *ngFor="let m of grupo.matches">
+          <!-- Título del casting -->
+          <div class="casting-match-info">
+            <div class="casting-match-titulo">
+              <div class="guion-color-bar"></div>
+              <span>{{ m.script?.titulo || 'Sin título' }}</span>
+            </div>
+            <p class="match-bio-compact">{{ grupo.actor?.bio || 'Sin descripción' }}</p>
+          </div>
+
+          <!-- Acciones -->
+          <div class="match-acciones">
+            <button class="btn-rechazar" (click)="rechazar(m._id)">
+              <ion-icon name="close-outline"></ion-icon> Rechazar
+            </button>
+            <button class="btn-aceptar" (click)="aceptar(m._id)">
+              <ion-icon name="checkmark-outline"></ion-icon> Aceptar
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ACEPTADOS ═══ -->
+  <div class="grupos-lista" *ngIf="!cargando && filtroActual === 'aceptado'">
+
+    <div *ngIf="gruposAceptados.length === 0" class="empty-state">
+      <ion-icon name="checkmark-circle-outline" class="empty-icon"></ion-icon>
+      <p class="empty-titulo">Sin actores aceptados</p>
+      <p class="empty-sub">Los actores que aceptes aparecerán aquí.</p>
+    </div>
+
+    <div class="grupo-card aceptado" *ngFor="let grupo of gruposAceptados">
+
+      <!-- Cabecera: actor -->
+      <div class="grupo-header" (click)="toggleGrupo(grupo)">
+        <div class="match-avatar">
+          <img *ngIf="grupo.actor?.foto" [src]="getImgUrl(grupo.actor.foto)" />
+          <div *ngIf="!grupo.actor?.foto" class="avatar-inicial">{{ getInitial(grupo.actor?.nombre) }}</div>
+        </div>
+        <div class="grupo-info">
+          <div class="grupo-row-top">
+            <h3 class="grupo-nombre">
+              {{ grupo.actor?.nombre || 'Actor' }}
+              <span class="match-edad" *ngIf="grupo.actor?.edad">, {{ grupo.actor.edad }}</span>
+            </h3>
+            <div class="grupo-badges">
+              <div class="badge-aceptado">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </div>
+              <ion-icon
+                *ngIf="grupo.matches.length > 1"
+                [name]="grupo.expandido ? 'chevron-down-outline' : 'chevron-forward-outline'"
+                class="grupo-chevron">
+              </ion-icon>
+            </div>
+          </div>
+          <p class="grupo-ubicacion" *ngIf="grupo.actor?.ciudad">
+            <ion-icon name="location-outline"></ion-icon> {{ grupo.actor.ciudad }}
+          </p>
+          <p class="grupo-subtitulo aceptado" *ngIf="grupo.matches.length > 1">
+            <ion-icon name="film-outline"></ion-icon>
+            Aceptado en {{ grupo.matches.length }} castings
+          </p>
+        </div>
+      </div>
+
+      <!-- Lista de castings aceptados -->
+      <div class="castings-lista"
+           [class.siempre-visible]="grupo.matches.length === 1"
+           [class.expandido]="grupo.matches.length > 1 && grupo.expandido">
+
+        <div class="casting-match-row aceptado-row" *ngFor="let m of grupo.matches">
+          <div class="casting-match-titulo">
+            <div class="guion-color-bar verde"></div>
+            <span>{{ m.script?.titulo || 'Sin título' }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="height:80px"></div>
+</ion-content>

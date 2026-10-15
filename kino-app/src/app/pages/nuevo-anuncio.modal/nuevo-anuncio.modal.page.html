@@ -1,0 +1,299 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nuevo Anuncio</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- GALERÍA DE FOTOS (hasta 5) -->
+  <div class="galeria-wrap">
+    <div class="galeria-previews" *ngIf="form.imagenesUrls.length > 0">
+      <div class="galeria-preview-item" *ngFor="let url of form.imagenesUrls; let i = index">
+        <img [src]="url" class="galeria-thumb" />
+        <button class="btn-quitar-foto" (click)="quitarImagenUrl(i)">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </button>
+        <span class="galeria-num">{{ i + 1 }}</span>
+      </div>
+      <div class="galeria-add-slot" *ngIf="form.imagenesUrls.length < MAX_IMAGENES">
+        <ion-icon name="add-outline"></ion-icon>
+        <span>{{ MAX_IMAGENES - form.imagenesUrls.length }} restantes</span>
+      </div>
+    </div>
+
+    <div class="galeria-placeholder" *ngIf="form.imagenesUrls.length === 0">
+      <ion-icon name="images-outline" class="galeria-placeholder-icon"></ion-icon>
+      <p>Añade hasta 5 fotos para tu casting</p>
+      <p class="galeria-hint">Pasarán automáticamente en la card</p>
+    </div>
+
+    <div class="galeria-input-wrap" *ngIf="form.imagenesUrls.length < MAX_IMAGENES">
+      <input
+        #urlInputRef
+        type="url"
+        [(ngModel)]="nuevaImagenUrl"
+        placeholder="https://url-de-la-imagen.com/foto.jpg"
+        class="galeria-input"
+        (keyup.enter)="agregarImagenUrl()"
+      />
+      <button class="btn-add-foto" (click)="agregarImagenUrl()" [disabled]="!nuevaImagenUrl.trim()">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+    </div>
+    <p class="galeria-counter">{{ form.imagenesUrls.length }}/{{ MAX_IMAGENES }} fotos</p>
+  </div>
+
+  <div class="form-body">
+
+    <!-- TÍTULO -->
+    <div class="campo">
+      <input
+        type="text"
+        [(ngModel)]="form.titulo"
+        placeholder="Título del Casting"
+        class="input-titulo"
+      />
+    </div>
+
+    <!-- GÉNEROS -->
+    <div class="campo">
+      <label class="campo-label">Géneros</label>
+      <div class="generos-wrap">
+        <div
+          class="genero-chip"
+          *ngFor="let g of generosDisponibles"
+          [class.activo]="generosSeleccionados.includes(g)"
+          (click)="toggleGenero(g)"
+        >{{ g }}</div>
+        <button class="chip-add" (click)="agregarGeneroCustom()">
+          <ion-icon name="add-outline"></ion-icon> Añadir
+        </button>
+      </div>
+    </div>
+
+    <!-- SINOPSIS -->
+    <div class="campo">
+      <textarea
+        [(ngModel)]="form.sinopsis"
+        placeholder="Sinopsis"
+        class="input-sinopsis"
+        rows="4"
+      ></textarea>
+    </div>
+
+    <!-- RANGO DE EDADES -->
+    <div class="campo">
+      <label class="campo-label">Rango de Edades</label>
+      <div class="campo-doble">
+        <div class="campo-mitad">
+          <ion-icon name="people-outline" class="campo-icon"></ion-icon>
+          <input type="number" [(ngModel)]="form.edadMin" placeholder="Mín"
+                 class="input-small" min="0" max="99" />
+        </div>
+        <div class="campo-mitad">
+          <ion-icon name="people-outline" class="campo-icon"></ion-icon>
+          <input type="number" [(ngModel)]="form.edadMax" placeholder="Máx"
+                 class="input-small" min="0" max="99" />
+        </div>
+      </div>
+    </div>
+
+    <!-- UBICACIÓN -->
+    <div class="campo">
+      <label class="campo-label">Ubicación</label>
+
+      <!-- Selector de idioma -->
+      <div class="idioma-selector">
+        <button [class.activo]="idiomaUbicacion === 'es'" (click)="idiomaUbicacion = 'es'">🇪🇸 Español</button>
+        <button [class.activo]="idiomaUbicacion === 'en'" (click)="idiomaUbicacion = 'en'">🇬🇧 English</button>
+      </div>
+
+      <!-- Dropdown país -->
+      <div class="custom-select-wrap">
+        <div class="custom-select-trigger"
+             (click)="dropdownPaisAbierto = !dropdownPaisAbierto; dropdownEstadoAbierto = false"
+             [class.abierto]="dropdownPaisAbierto"
+             [class.disabled]="cargandoPaises">
+          <span *ngIf="!paisSeleccionado" class="custom-select-placeholder">
+            {{ cargandoPaises ? 'Cargando países...' : (idiomaUbicacion === 'es' ? '🌍  Selecciona un país' : '🌍  Select a country') }}
+          </span>
+          <span *ngIf="paisSeleccionado" class="custom-select-value">
+            <img [src]="'https://flagcdn.com/24x18/' + getPaisCca2(paisSeleccionado) + '.png'"
+                 class="option-flag-img" />
+            {{ idiomaUbicacion === 'es' ? paisSeleccionado : getPaisNameEn(paisSeleccionado) }}
+          </span>
+          <ion-icon name="chevron-down-outline" class="select-arrow" [class.rotado]="dropdownPaisAbierto"></ion-icon>
+        </div>
+
+        <div class="custom-select-dropdown" *ngIf="dropdownPaisAbierto">
+          <div class="custom-select-search">
+            <ion-icon name="search-outline"></ion-icon>
+            <input type="text" [(ngModel)]="filtroPais"
+                   [placeholder]="idiomaUbicacion === 'es' ? 'Buscar país...' : 'Search country...'"
+                   class="search-pais-input"
+                   (click)="$event.stopPropagation()" />
+          </div>
+          <div class="custom-select-list">
+            <div class="custom-select-option"
+                 *ngFor="let p of getPaisesFiltrados()"
+                 (click)="seleccionarPais(p)">
+              <img [src]="'https://flagcdn.com/24x18/' + p.cca2 + '.png'"
+                   [alt]="p.nameEs"
+                   class="option-flag-img"
+                   loading="lazy" />
+              <span class="option-name">{{ idiomaUbicacion === 'es' ? p.nameEs : p.nameEn }}</span>
+            </div>
+            <div class="custom-select-empty" *ngIf="getPaisesFiltrados().length === 0">
+              {{ idiomaUbicacion === 'es' ? 'Sin resultados' : 'No results' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dropdown provincia -->
+      <div class="custom-select-wrap campo-top-gap" *ngIf="paisSeleccionado">
+        <div class="custom-select-trigger"
+             (click)="dropdownEstadoAbierto = !dropdownEstadoAbierto; dropdownPaisAbierto = false"
+             [class.abierto]="dropdownEstadoAbierto"
+             [class.disabled]="cargandoEstados">
+    <span *ngIf="!form.ubicacion" class="custom-select-placeholder">
+      {{ cargandoEstados ? (idiomaUbicacion === 'es' ? 'Traduciendo...' : 'Loading...') : (idiomaUbicacion === 'es' ? '📍  Selecciona provincia / estado' : '📍  Select province / state') }}
+    </span>
+          <span *ngIf="form.ubicacion" class="custom-select-value">
+      📍 {{ form.ubicacion }}
+    </span>
+          <ion-icon name="chevron-down-outline" class="select-arrow" [class.rotado]="dropdownEstadoAbierto"></ion-icon>
+        </div>
+
+        <div class="custom-select-dropdown" *ngIf="dropdownEstadoAbierto">
+          <div class="custom-select-list">
+            <div class="custom-select-option"
+                 *ngFor="let e of estados"
+                 (click)="seleccionarEstado(e)">
+              <span class="option-name">{{ idiomaUbicacion === 'es' ? e.nameEs : e.nameEn }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUISITOS -->
+    <div class="campo">
+      <label class="campo-label">Requisitos del Casting</label>
+      <div class="requisitos-lista" *ngIf="form.requisitos.length > 0">
+        <div class="requisito-fila" *ngFor="let r of form.requisitos; let i = index">
+          <div class="requisito-item">
+            <ion-icon name="checkmark-circle-outline" class="req-icon"></ion-icon>
+            <span>{{ r }}</span>
+          </div>
+          <button class="btn-quitar-req" (click)="quitarRequisito(i)">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+      <div class="requisito-input-wrap">
+        <input
+          type="text"
+          [(ngModel)]="nuevoRequisito"
+          placeholder="Ej: Experiencia en teatro, Inglés fluido..."
+          class="input-requisito"
+          (keyup.enter)="agregarRequisito()"
+        />
+        <button class="btn-add-req" (click)="agregarRequisito()" [disabled]="!nuevoRequisito.trim()">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </div>
+      <p class="campo-hint">Pulsa Enter o + para añadir cada requisito.</p>
+    </div>
+
+    <!-- PDF DEL GUION -->
+    <div class="campo">
+      <label class="campo-label">Script PDF (Obligatorio)</label>
+      <div class="pdf-upload-wrap" *ngIf="!form.pdfUrl" (click)="seleccionarPdf()">
+        <ion-icon name="document-text-outline" class="pdf-icon"></ion-icon>
+        <span class="pdf-texto">Toca para seleccionar el archivo PDF</span>
+      </div>
+      <div class="pdf-archivo-seleccionado" *ngIf="form.pdfUrl">
+        <ion-icon name="document-attach-outline" class="pdf-icon-ok"></ion-icon>
+        <span class="pdf-nombre">{{ nombrePdf }}</span>
+        <button class="btn-quitar-pdf" (click)="quitarPdf()">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </button>
+      </div>
+      <p class="campo-hint">El PDF debe subirse obligatoriamente para publicar el casting.</p>
+    </div>
+
+    <!-- LIVE PREVIEW -->
+    <div class="preview-seccion" *ngIf="form.titulo || form.sinopsis">
+      <div class="preview-header">
+        <span class="preview-label">VISTA PREVIA</span>
+        <span class="preview-view">Card View</span>
+      </div>
+      <div class="preview-card">
+        <div class="preview-portada">
+          <img *ngIf="form.imagenUrl" [src]="form.imagenUrl" class="preview-portada-img" />
+          <div *ngIf="!form.imagenUrl" class="preview-portada-placeholder"></div>
+          <span class="preview-badge">CASTING CALL</span>
+        </div>
+        <div class="preview-info">
+          <h3 class="preview-titulo">{{ form.titulo || 'Project Title' }}</h3>
+          <p class="preview-sinopsis">{{ form.sinopsis | slice:0:80 }}{{ (form.sinopsis?.length || 0) > 80 ? '...' : '' }}</p>
+          <div class="preview-meta">
+            <span *ngFor="let g of generosSeleccionados" class="preview-meta-item">
+              <ion-icon name="film-outline"></ion-icon> {{ g }}
+            </span>
+            <span *ngIf="form.edadMin || form.edadMax" class="preview-meta-item">
+              <ion-icon name="people-outline"></ion-icon> {{ form.edadMin }}–{{ form.edadMax }} años
+            </span>
+            <span *ngIf="form.ubicacion" class="preview-meta-item">
+              <ion-icon name="location-outline"></ion-icon> {{ form.ubicacion }}
+            </span>
+          </div>
+          <div class="preview-requisitos" *ngIf="form.requisitos.length > 0">
+            <span class="preview-req-item" *ngFor="let r of form.requisitos | slice:0:2">
+              <ion-icon name="checkmark-circle-outline"></ion-icon> {{ r }}
+            </span>
+            <span class="preview-req-mas" *ngIf="form.requisitos.length > 2">
+              +{{ form.requisitos.length - 2 }} más
+            </span>
+          </div>
+          <div class="preview-footer">
+            <div class="preview-avatar">
+              <ion-icon name="person-outline"></ion-icon>
+            </div>
+            <span class="preview-autor">{{ usuarioNombre }}</span>
+            <span class="preview-time">Just now</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</ion-content>
+
+<!-- FOOTER -->
+<ion-footer class="ion-no-border">
+  <div class="footer-btn-wrap">
+    <button
+      class="btn-publicar"
+      [disabled]="!form.titulo.trim() || guardando"
+      (click)="publicar()"
+    >
+      <ion-spinner *ngIf="guardando" name="crescent"></ion-spinner>
+      <ion-icon *ngIf="!guardando" name="megaphone-outline"></ion-icon>
+      <span *ngIf="!guardando">Publicar Anuncio</span>
+    </button>
+  </div>
+</ion-footer>

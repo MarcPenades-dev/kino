@@ -1,0 +1,440 @@
+$naranja: #FF6D00;
+$fondo: #0A0A0A;
+$card: #141414;
+$borde: #2A2A2A;
+$blanco: #FFFFFF;
+$blanco-70: rgba(255,255,255,0.7);
+$blanco-40: rgba(255,255,255,0.4);
+$gris: #888888;
+$rojo: #EB445A;
+$transicion: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+ion-toolbar {
+  --background: #{$fondo};
+  --color: #{$blanco};
+}
+
+.header-titulo {
+  color: $blanco;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.btn-save-text {
+  color: $naranja;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.edit-content { --background: #{$fondo}; }
+
+
+.foto-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 20px;
+  border-bottom: 1px solid $borde;
+}
+
+.foto-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: $card;
+  border: 3px solid rgba($naranja, 0.4);
+  margin-bottom: 12px;
+  transition: $transicion;
+
+  &:active { transform: scale(0.97); }
+}
+
+.foto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-inicial {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: $naranja;
+  background: rgba($naranja, 0.08);
+}
+
+.foto-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon { font-size: 1.5rem; color: $blanco; }
+}
+
+.btn-change-foto {
+  background: transparent;
+  border: none;
+  color: $naranja;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  &:active { opacity: 0.7; }
+}
+
+
+.form-container {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: $gris;
+  text-transform: uppercase;
+  padding-top: 8px;
+  border-top: 1px solid $borde;
+  margin-top: 4px;
+
+  .section-hint {
+    font-size: 0.7rem;
+    color: rgba($naranja, 0.8);
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $gris;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.char-counter {
+  font-size: 0.72rem;
+  color: $gris;
+  font-weight: 600;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-half { flex: 1; }
+
+.field-wrap {
+  display: flex;
+  align-items: center;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 10px;
+  padding: 13px 14px;
+  gap: 10px;
+  transition: $transicion;
+
+  &:focus-within {
+    border-color: $naranja;
+    box-shadow: 0 0 0 3px rgba($naranja, 0.08);
+  }
+
+  &.textarea-wrap { align-items: flex-start; }
+  &.select-wrap { padding: 0 14px; height: 48px; }
+}
+
+.field-icon {
+  font-size: 1.1rem;
+  color: $gris;
+  flex-shrink: 0;
+}
+
+.field-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  &::placeholder { color: #444; }
+  &.field-textarea { resize: none; line-height: 1.5; }
+}
+
+.field-select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  option { background: #1a1a1a; color: $blanco; }
+}
+
+.select-arrow {
+  font-size: 0.9rem;
+  color: $gris;
+  pointer-events: none;
+}
+
+
+.generos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genero-chip {
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 20px;
+  padding: 7px 14px;
+  color: $gris;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transicion;
+
+  &.activo {
+    background: $naranja;
+    border-color: $naranja;
+    color: $blanco;
+  }
+
+  &.add-chip {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-style: dashed;
+    ion-icon { font-size: 1rem; }
+  }
+
+  &:active { transform: scale(0.95); }
+}
+
+
+.portfolio-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.portfolio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.portfolio-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 1rem; }
+
+  &.video { background: rgba($naranja, 0.15); ion-icon { color: $naranja; } }
+  &.foto { background: rgba(45,211,111,0.12); ion-icon { color: #2dd36f; } }
+  &.link { background: rgba(61,182,255,0.12); ion-icon { color: #3db6ff; } }
+}
+
+.portfolio-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.portfolio-item-titulo {
+  display: block;
+  color: $blanco;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.portfolio-item-tipo {
+  display: block;
+  color: $gris;
+  font-size: 0.72rem;
+}
+
+.portfolio-item-actions { display: flex; gap: 6px; }
+
+.btn-portfolio-action {
+  background: transparent;
+  border: none;
+  color: $gris;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  ion-icon { font-size: 1rem; }
+  &:active { color: $rojo; }
+}
+
+.portfolio-empty-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $card;
+  border: 1px dashed $borde;
+  border-radius: 10px;
+  padding: 14px;
+  color: $gris;
+  font-size: 0.82rem;
+
+  ion-icon { font-size: 1.2rem; color: rgba($naranja, 0.4); flex-shrink: 0; }
+}
+
+.btn-add-media {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: $naranja;
+  border: 1px solid rgba($naranja, 0.3);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  ion-icon { font-size: 0.85rem; }
+}
+
+
+.links-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 10px;
+  padding: 10px 12px;
+
+  &:focus-within {
+    border-color: $naranja;
+  }
+}
+
+.link-icon {
+  font-size: 1.1rem;
+  color: $gris;
+  flex-shrink: 0;
+}
+
+.link-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 0.88rem;
+  &::placeholder { color: #444; }
+}
+
+.btn-quitar-link {
+  background: transparent;
+  border: none;
+  color: $gris;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  ion-icon { font-size: 1rem; }
+  &:active { color: $rojo; }
+}
+
+.btn-add-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed $borde;
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: $gris;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: $transicion;
+
+  ion-icon { font-size: 1rem; }
+  &:active { border-color: $naranja; color: $naranja; }
+}
+
+
+.edit-footer { --background: #{$fondo}; }
+
+.footer-content {
+  padding: 12px 16px 28px;
+  border-top: 1px solid $borde;
+}
+
+.btn-save-changes {
+  width: 100%;
+  background: $naranja;
+  color: $blanco;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: $transicion;
+
+  &:active { transform: scale(0.98); }
+  &:disabled { background: #2a2a2a; color: #555; }
+}
+
+.bottom-spacer { height: 20px; }

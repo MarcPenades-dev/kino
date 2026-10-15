@@ -1,0 +1,289 @@
+$naranja: #FF6D00;
+$fondo: #0A0A0A;
+$card: #141414;
+$borde: #2A2A2A;
+$blanco: #FFFFFF;
+$blanco-80: rgba(255,255,255,0.8);
+$blanco-50: rgba(255,255,255,0.5);
+$gris: #888888;
+$rojo: #EB445A;
+$transicion: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+ion-toolbar {
+  --background: #{$fondo};
+  --color: #{$blanco};
+}
+
+.step-label {
+  color: $naranja;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.btn-nav {
+  --color: #{$blanco-80};
+  font-size: 0.9rem;
+  font-weight: 600;
+  ion-icon { font-size: 1.1rem; }
+}
+
+.btn-skip {
+  --color: #{$gris};
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.setup-content { --background: #{$fondo}; }
+
+.setup-container {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.setup-header {
+  text-align: center;
+  .setup-titulo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $blanco;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+  .setup-subtitulo {
+    font-size: 0.9rem;
+    color: $gris;
+    margin: 0;
+  }
+}
+
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: $gris;
+  text-transform: uppercase;
+}
+
+.section-hint {
+  font-size: 0.72rem;
+  color: rgba($naranja, 0.8);
+  font-weight: 600;
+}
+
+
+.generos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genero-chip {
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: $gris;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transicion;
+
+  &.activo {
+    background: $naranja;
+    border-color: $naranja;
+    color: $blanco;
+  }
+
+  &:active { transform: scale(0.95); }
+}
+
+
+.portfolio-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $card;
+  border: 1px dashed $borde;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: $transicion;
+
+  &:active {
+    border-color: $naranja;
+    background: rgba($naranja, 0.05);
+  }
+}
+
+.portfolio-option-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 1.2rem; }
+
+  &.reel {
+    background: rgba($naranja, 0.15);
+    ion-icon { color: $naranja; }
+  }
+  &.file {
+    background: rgba(61, 182, 255, 0.12);
+    ion-icon { color: #3db6ff; }
+  }
+  &.foto {
+    background: rgba(45, 211, 111, 0.12);
+    ion-icon { color: #2dd36f; }
+  }
+}
+
+.portfolio-option-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portfolio-option-titulo {
+  color: $blanco;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.portfolio-option-sub {
+  color: $gris;
+  font-size: 0.75rem;
+}
+
+.portfolio-arrow {
+  font-size: 1rem;
+  color: $gris;
+}
+
+
+.portfolio-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.portfolio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba($naranja, 0.06);
+  border: 1px solid rgba($naranja, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.portfolio-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba($naranja, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 1rem; color: $naranja; }
+}
+
+.portfolio-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.portfolio-item-titulo {
+  display: block;
+  color: $blanco;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.portfolio-item-tipo {
+  display: block;
+  color: $gris;
+  font-size: 0.72rem;
+}
+
+.btn-quitar {
+  background: transparent;
+  border: none;
+  color: $gris;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  ion-icon { font-size: 1.1rem; }
+  &:active { color: $rojo; }
+}
+
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: $rojo;
+  font-size: 0.82rem;
+  margin: 0;
+  ion-icon { font-size: 1rem; }
+}
+
+
+.setup-footer { --background: #{$fondo}; }
+
+.footer-content {
+  padding: 12px 20px 28px;
+  border-top: 1px solid $borde;
+}
+
+.btn-finish {
+  width: 100%;
+  background: $naranja;
+  color: $blanco;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $transicion;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  ion-icon { font-size: 1.1rem; }
+  &:active { transform: scale(0.98); }
+  &:disabled { background: #2a2a2a; color: #555; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

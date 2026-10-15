@@ -1,0 +1,176 @@
+<ion-header class="ion-no-border edit-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="btn-cancel" (click)="cancelar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-title">
+      <span class="title-label">Editar Perfil</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="btn-save" (click)="guardarCambios()" [disabled]="guardando">
+        <span class="save-text" *ngIf="!guardando">Guardar</span>
+        <ion-spinner name="crescent" *ngIf="guardando"></ion-spinner>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="edit-content">
+
+  <!-- FOTO DE PERFIL -->
+  <div class="photo-section">
+    <div class="photo-container">
+      <div class="photo-circle" (click)="cambiarFoto()">
+        <img *ngIf="fotoPreview" [src]="fotoPreview" class="profile-photo" />
+        <div *ngIf="!fotoPreview" class="photo-initial">
+          {{ getInitial() }}
+        </div>
+        <div class="photo-overlay">
+          <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
+        </div>
+      </div>
+    </div>
+    <button class="btn-change-photo" (click)="cambiarFoto()">
+      <ion-icon name="camera-outline"></ion-icon>
+      <span>Cambiar foto</span>
+    </button>
+    <input
+      type="file"
+      #fileInput
+      accept="image/*"
+      style="display:none"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="form-container">
+
+    <!-- NOMBRE COMPLETO -->
+    <div class="form-section">
+      <div class="form-field">
+        <label class="field-label">Nombre completo</label>
+        <div class="field-wrapper">
+          <ion-icon name="person-outline" class="field-icon"></ion-icon>
+          <input
+            type="text"
+            [(ngModel)]="perfil.nombre"
+            class="field-input"
+            placeholder="Ejemplo Nombre"
+          />
+        </div>
+        <span class="field-hint">Como aparecerá en tu perfil público y en tus castings.</span>
+      </div>
+    </div>
+
+    <!-- EDAD -->
+    <div class="form-section">
+      <div class="form-field">
+        <label class="field-label">Edad</label>
+        <div class="field-wrapper">
+          <ion-icon name="person-outline" class="field-icon"></ion-icon>
+          <input
+            type="number"
+            [(ngModel)]="perfil.edad"
+            class="field-input"
+            placeholder="25"
+            min="16"
+            max="99"
+          />
+        </div>
+        <span class="field-hint warning">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          Debes ser mayor de 16 años para registrarte.
+        </span>
+      </div>
+    </div>
+
+    <!-- AGENCIA -->
+    <div class="form-section">
+      <div class="form-field">
+        <label class="field-label">Agencia / Afiliación</label>
+        <div class="field-wrapper">
+          <ion-icon name="briefcase-outline" class="field-icon"></ion-icon>
+          <input
+            type="text"
+            [(ngModel)]="perfil.agencia"
+            class="field-input"
+            placeholder="Independiente"
+          />
+        </div>
+        <span class="field-hint">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Déjalo como "Independiente" si no tienes agencia.
+        </span>
+      </div>
+    </div>
+
+    <!-- UBICACIÓN -->
+    <div class="form-section">
+      <div class="form-field">
+        <label class="field-label">Ubicación</label>
+        <div class="field-wrapper">
+          <ion-icon name="location-outline" class="field-icon"></ion-icon>
+          <input
+            type="text"
+            [(ngModel)]="perfil.ciudad"
+            class="field-input"
+            placeholder="Ciudad, País"
+          />
+        </div>
+        <span class="field-hint">Ciudad y estado para oportunidades de casting locales.</span>
+      </div>
+    </div>
+
+    <!-- BIOGRAFÍA -->
+    <div class="form-section">
+      <div class="form-field">
+        <div class="label-with-counter">
+          <label class="field-label">Biografía profesional</label>
+          <span class="char-counter">{{ perfil.acercaDeMi?.length || 0 }}/300</span>
+        </div>
+        <div class="field-wrapper textarea-wrapper">
+          <textarea
+            [(ngModel)]="perfil.acercaDeMi"
+            class="field-input textarea"
+            placeholder="Destaca tus proyectos, formación y experiencia en la industria..."
+            rows="5"
+            maxlength="300"
+          ></textarea>
+        </div>
+        <span class="field-hint">
+          <ion-icon name="bulb-outline"></ion-icon>
+          Incluye tu formación, roles anteriores y tipo de personajes.
+        </span>
+      </div>
+    </div>
+
+    <!-- EMAIL DE CONTACTO -->
+    <div class="form-section">
+      <div class="form-field">
+        <label class="field-label">Email de contacto</label>
+        <div class="field-wrapper" [class.has-error]="emailInvalido">
+          <ion-icon name="mail-outline" class="field-icon"></ion-icon>
+          <input
+            type="email"
+            [(ngModel)]="perfil.emailContacto"
+            class="field-input"
+            placeholder="tu@email.com"
+          />
+        </div>
+        <span class="field-hint error" *ngIf="emailInvalido">
+          <ion-icon name="warning-outline"></ion-icon>
+          Introduce un formato de email válido.
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<!-- TOAST DE CONFIRMACIÓN -->
+<ion-toast *ngIf="mostrarToast" message="Perfil actualizado" [duration]="2000" color="success"></ion-toast>

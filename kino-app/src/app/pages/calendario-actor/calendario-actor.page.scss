@@ -1,0 +1,467 @@
+$naranja: #FF6D00;
+$fondo: #121212;
+$card: #1e1e1e;
+$card2: #252525;
+$borde: #2a2a2a;
+$blanco: #ffffff;
+$gris: #888888;
+$verde: #2dd36f;
+$rojo: #eb445a;
+
+// Content
+ion-content { --background: #{$fondo}; }
+
+
+.header-profesional {
+  ion-toolbar {
+    --background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    --color: #{$blanco};
+    --border-width: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+}
+
+.header-title-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  .header-logo {
+    height: 24px;
+    width: 24px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .header-main-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: $blanco;
+    letter-spacing: 1px;
+  }
+}
+
+.btn-header {
+  --color: #{$gris};
+  ion-icon { font-size: 1.3rem; }
+}
+
+// Loading
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 16px;
+
+  ion-spinner { --color: #{$naranja}; width: 44px; height: 44px; }
+  p { color: $gris; font-size: 0.9rem; }
+}
+
+
+.proximos-section {
+  padding: 20px 16px 8px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $blanco;
+  margin: 0 0 14px;
+}
+
+.proximos-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.proximo-card {
+  min-width: 140px;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 16px;
+  padding: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  flex-shrink: 0;
+
+  &:active {
+    transform: scale(0.97);
+    background: $card2;
+  }
+}
+
+.proximo-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba($naranja, 0.1);
+  color: $naranja;
+  margin-bottom: 8px;
+
+  &.hoy-badge {
+    background: rgba($naranja, 0.2);
+    color: $naranja;
+  }
+
+  &.manana-badge {
+    background: rgba($naranja, 0.15);
+    color: $naranja;
+  }
+}
+
+.proximo-titulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $blanco;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+
+.proximo-hora {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: $gris;
+
+  ion-icon { font-size: 0.85rem; color: $naranja; }
+}
+
+// Calendario
+.calendario-card {
+  margin: 12px 16px;
+  background: $card;
+  border-radius: 14px;
+  border: 1px solid $borde;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.nav-btn {
+  background: $card2;
+  border: 1px solid $borde;
+  color: $blanco;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  ion-icon { font-size: 1rem; }
+
+  &:active { background: rgba($naranja, 0.15); }
+}
+
+.cal-titulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.mes-nombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $blanco;
+}
+
+.año {
+  font-size: 0.72rem;
+  color: $gris;
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+
+.dia-semana {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: $gris;
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.semanas {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.dia-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s;
+  gap: 1px;
+
+  &.vacio { cursor: default; }
+
+  &.hoy {
+    background: rgba($naranja, 0.12);
+    border: 1px solid rgba($naranja, 0.3);
+    .dia-num { color: $naranja; font-weight: 700; }
+  }
+
+  &.seleccionado {
+    background: $naranja;
+    .dia-num { color: $blanco; font-weight: 800; }
+    .evento-dot { background: rgba(0,0,0,0.25); }
+  }
+
+  &.tiene-evento:not(.seleccionado) {
+    background: rgba($naranja, 0.07);
+    border: 1px solid rgba($naranja, 0.18);
+  }
+
+  &:not(.vacio):not(.seleccionado):active {
+    background: $card2;
+  }
+}
+
+.dia-num {
+  font-size: 0.82rem;
+  color: $blanco;
+  line-height: 1;
+}
+
+.evento-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $naranja;
+  margin-top: 2px;
+
+  .seleccionado & {
+    background: rgba(255,255,255,0.7);
+  }
+}
+
+// Detalle del día
+.detalle-dia {
+  margin: 12px 16px 24px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detalle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 10px;
+
+  h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $blanco;
+    margin: 0;
+  }
+}
+
+.detalle-count {
+  background: rgba($naranja, 0.12);
+  color: $naranja;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba($naranja, 0.25);
+}
+
+.sin-eventos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 0;
+  gap: 8px;
+
+  ion-icon {
+    font-size: 2rem;
+    color: $gris;
+    opacity: 0.4;
+  }
+
+  p {
+    color: $gris;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+}
+
+.evento-card {
+  display: flex;
+  gap: 11px;
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 12px;
+  padding: 11px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.12s;
+
+  &:active {
+    transform: scale(0.98);
+    background: $card2;
+  }
+}
+
+.evento-img {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid $borde;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  &-placeholder {
+    background: rgba($naranja, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.2rem;
+      color: $naranja;
+    }
+  }
+}
+
+.evento-info { flex: 1; min-width: 0; }
+
+.evento-titulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: $blanco;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evento-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: $gris;
+
+  ion-icon { font-size: 0.75rem; color: $naranja; }
+}
+
+.evento-notas {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #ccaa55;
+  margin-bottom: 4px;
+  font-style: italic;
+
+  ion-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+}
+
+.evento-estado {
+  margin-top: 2px;
+}
+
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba($rojo, 0.1);
+  color: #ff6677;
+
+  ion-icon { font-size: 0.75rem; }
+
+  &.confirmado {
+    background: rgba($verde, 0.1);
+    color: $verde;
+  }
+}
+
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 32px;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 14px;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $blanco;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 0.82rem;
+    color: $gris;
+    line-height: 1.5;
+  }
+}

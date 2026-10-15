@@ -1,0 +1,224 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="toggleNotificaciones()">
+        <div class="notif-btn-wrap">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <div class="notif-count" *ngIf="totalNoLeidas > 0">{{ totalNoLeidas }}</div>
+        </div>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Inicio</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irABuscar()">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="seccion">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Mis Anuncios</h2>
+      <button class="btn-new" (click)="irAMisAnuncios()">
+        <ion-icon name="add-outline"></ion-icon> Nuevo
+      </button>
+    </div>
+
+    <div *ngIf="cargandoGuiones" class="centrado">
+      <ion-spinner name="crescent" color="warning"></ion-spinner>
+    </div>
+
+    <div *ngIf="!cargandoGuiones && misGuiones.length === 0" class="vacio">
+      <p>Sin anuncios aún. Pulsa <strong>+ New</strong> para crear uno.</p>
+    </div>
+
+    <div *ngIf="!cargandoGuiones && misGuiones.length > 0">
+      <div class="script-fila" *ngFor="let g of misGuiones" (click)="verDetalle(g._id)">
+        <div class="script-texto">
+          <h3 class="script-titulo">{{ g.titulo || 'Sin título' }}</h3>
+          <div class="script-tags">
+            <span class="tag" *ngFor="let t of splitGenero(g.genero)">{{ t }}</span>
+          </div>
+        </div>
+        <div class="script-toggle-bloque">
+          <span class="toggle-etiqueta">{{ g.publico ? 'Publico' : 'Privado' }}</span>
+          <div class="toggle" [class.activo]="g.publico" (click)="togglePublico(g, $event)">
+            <div class="toggle-circulo"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="separador"></div>
+
+  <div class="seccion">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Actores Pendientes</h2>
+    </div>
+
+    <div *ngIf="cargandoMatches" class="centrado">
+      <ion-spinner name="crescent" color="warning"></ion-spinner>
+    </div>
+
+    <div *ngIf="!cargandoMatches && matchesPendientes.length === 0" class="vacio">
+      <p>No hay actores pendientes de revisión.</p>
+    </div>
+
+    <div class="actor-fila" *ngFor="let m of matchesPendientes">
+      <div class="actor-avatar">
+        <img *ngIf="m.actor?.foto" [src]="getImgUrl(m.actor.foto)" />
+        <div *ngIf="!m.actor?.foto" class="actor-inicial">{{ getInitial(m.actor?.nombre) }}</div>
+      </div>
+      <div class="actor-info">
+        <p class="actor-nombre">
+          {{ m.actor?.nombre || 'Actor' }}
+          <span class="actor-edad" *ngIf="m.actor?.edad"> {{ m.actor.edad }} yrs</span>
+        </p>
+        <p class="actor-bio">{{ m.actor?.bio || 'Sin descripción' }}</p>
+      </div>
+      <div class="actor-botones">
+        <button class="btn-aceptar" (click)="aceptarMatch(m._id, $event)">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </button>
+        <button class="btn-rechazar" (click)="rechazarMatch(m._id, $event)">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="separador"></div>
+
+  <div class="seccion">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Perfil Director Casting</h2>
+    </div>
+
+    <div class="director-card" *ngIf="user" (click)="irAPerfil()">
+      <div class="director-avatar">
+        <img *ngIf="user.foto" [src]="getImgUrl(user.foto)" />
+        <div *ngIf="!user.foto" class="director-inicial">{{ getInitial(user.nombre) }}</div>
+      </div>
+      <div class="director-info">
+        <p class="director-nombre">{{ user.nombre }}</p>
+        <span class="director-rol">Casting Director</span>
+        <p class="director-bio">{{ user.bio || 'Añade una bio en tu perfil.' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="separador"></div>
+
+  <!-- CASTINGS PÚBLICOS -->
+  <div class="seccion seccion-ultima">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Castings Públicos</h2>
+    </div>
+
+    <div *ngIf="cargandoGuiones" class="centrado">
+      <ion-spinner name="crescent" color="warning"></ion-spinner>
+    </div>
+
+    <div *ngIf="!cargandoGuiones && guionesPublicos.length === 0" class="vacio">
+      <p>No tienes anuncios públicos activos.</p>
+    </div>
+
+    <div class="feed-lista" *ngIf="!cargandoGuiones && guionesPublicos.length > 0">
+      <div class="casting-card" *ngFor="let g of guionesPublicos; let i = index"
+        [style.animation-delay]="i * 60 + 'ms'">
+
+        <!-- IMAGEN CON CARRUSEL AUTOMÁTICO -->
+        <div class="card-img-wrap">
+
+          <!-- Carrusel: múltiples imágenes -->
+          <ng-container *ngIf="getImagenes(g).length > 1">
+            <img
+              *ngFor="let img of getImagenes(g); let i = index"
+              [src]="img"
+              class="card-img carrusel-slide"
+              [class.activa]="getSlideActivo(g._id) === i"
+            />
+          </ng-container>
+
+          <!-- Imagen única -->
+          <img *ngIf="getImagenes(g).length === 1" [src]="getImagenes(g)[0]" class="card-img" />
+          <div *ngIf="getImagenes(g).length === 0" class="card-img-placeholder"></div>
+
+          <!-- Dots indicadores -->
+          <div class="carrusel-dots" *ngIf="getImagenes(g).length > 1">
+            <span
+              class="dot"
+              *ngFor="let img of getImagenes(g); let i = index"
+              [class.activo]="getSlideActivo(g._id) === i">
+            </span>
+          </div>
+
+          <div class="badge-rol" [ngClass]="getRolClass(g)">
+            {{ getRolLabel(g) }}
+          </div>
+
+          <!-- ACCIONES EDITAR / ELIMINAR -->
+          <div class="card-acciones">
+            <button class="card-accion-btn edit" (click)="editarGuion(g, $event)">
+              <ion-icon name="create-outline"></ion-icon>
+            </button>
+            <button class="card-accion-btn delete" (click)="eliminarGuion(g._id, $event)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- CUERPO DE LA CARD -->
+        <div class="card-body" (click)="verDetalle(g._id)">
+
+          <div class="card-generos">
+            <span class="genero-tag" *ngFor="let gen of splitGenero(g.genero) | slice:0:2">
+              {{ gen }}
+            </span>
+          </div>
+
+          <h2 class="card-titulo">{{ g.titulo || 'Sin título' }}</h2>
+
+          <p class="card-director">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            Dir. {{ g.guionista?.nombre || user?.nombre || 'Director' }}
+          </p>
+
+          <p class="card-sinopsis">{{ g.sinopsis }}</p>
+
+          <div class="card-meta">
+            <span class="meta-item" *ngIf="g.ubicacion">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ g.ubicacion }}
+            </span>
+            <span class="meta-item" *ngIf="g.edades">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ g.edades }}
+            </span>
+            <span class="meta-pago" *ngIf="g.contacto">
+              {{ g.contacto }}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
+
+<app-notificaciones-panel *ngIf="mostrarNotificaciones"
+  (cerrado)="mostrarNotificaciones = false">
+</app-notificaciones-panel>

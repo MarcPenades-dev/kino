@@ -1,0 +1,166 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="btn-back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Mis Chats</span>
+        <span class="header-badge" *ngIf="totalNoLeidos > 0">{{ totalNoLeidos }}</span>
+      </div>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="btn-search">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="chats-content">
+
+  <!-- BUSCADOR -->
+  <div class="search-wrap visible">
+    <div class="search-bar">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarChats()" placeholder="Buscar chats..."
+        class="search-input" #searchInput />
+      <button class="btn-clear" *ngIf="busqueda" (click)="limpiarBusqueda()">
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filtros-row">
+    <button class="filtro-btn" [class.activo]="filtroActivo === 'todos'" (click)="setFiltro('todos')">Todos</button>
+    <button class="filtro-btn" [class.activo]="filtroActivo === 'favoritos'" (click)="setFiltro('favoritos')">
+      <ion-icon [name]="filtroActivo === 'favoritos' ? 'star' : 'star-outline'"></ion-icon> Favoritos
+    </button>
+    <button class="filtro-btn" [class.activo]="filtroActivo === 'noleidos'" (click)="setFiltro('noleidos')">
+      <ion-icon [name]="filtroActivo === 'noleidos' ? 'chatbubble' : 'chatbubble-outline'"></ion-icon> No leídos
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <!-- EMPTY SIN BÚSQUEDA -->
+  <div class="empty-container" *ngIf="!cargando && gruposFiltrados.length === 0 && !busqueda">
+    <div class="empty-icon-wrap">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+    </div>
+    <h3 class="empty-title">Sin conversaciones</h3>
+    <p class="empty-sub">Cuando chatees con actores o directores aparecerán aquí.</p>
+  </div>
+
+  <!-- EMPTY CON BÚSQUEDA -->
+  <div class="empty-container" *ngIf="!cargando && gruposFiltrados.length === 0 && busqueda">
+    <ion-icon name="search-outline" class="empty-icon-search"></ion-icon>
+    <p class="empty-sub">No se encontró "{{ busqueda }}"</p>
+  </div>
+
+  <!-- GRUPOS -->
+  <div class="grupos-lista" *ngIf="!cargando && gruposFiltrados.length > 0">
+
+    <div class="grupo-card" *ngFor="let grupo of gruposFiltrados">
+
+      <!-- ── CABECERA: PERSONA ── -->
+      <div class="grupo-header" (click)="toggleGrupo(grupo)">
+
+        <!-- Avatar -->
+        <div class="avatar-wrap">
+          <div class="chat-avatar" [class.tiene-foto]="grupo.persona?.foto">
+            <img *ngIf="grupo.persona?.foto" [src]="getImgUrl(grupo.persona.foto)" class="avatar-img" />
+            <span *ngIf="!grupo.persona?.foto" class="avatar-inicial">
+              {{ getInitial(grupo.persona?.nombre) }}
+            </span>
+          </div>
+          <div class="status-dot" [class.unread]="grupo.noLeidosTotal > 0"></div>
+        </div>
+
+        <!-- Nombre + meta -->
+        <div class="grupo-info">
+          <div class="grupo-row-top">
+            <h3 class="grupo-nombre" [class.unread]="grupo.noLeidosTotal > 0">
+              {{ grupo.persona?.nombre || 'Usuario' }}
+            </h3>
+            <div class="grupo-meta-right">
+              <div class="unread-badge" *ngIf="grupo.noLeidosTotal > 0">{{ grupo.noLeidosTotal }}</div>
+              <!-- Chevron solo si tiene varios castings -->
+              <ion-icon *ngIf="grupo.chats.length > 1"
+                [name]="grupo.expandido ? 'chevron-down-outline' : 'chevron-forward-outline'" class="grupo-chevron">
+              </ion-icon>
+            </div>
+          </div>
+          <!-- Subtítulo: nº de castings si son varios -->
+          <p class="grupo-subtitulo" *ngIf="grupo.chats.length > 1">
+            <ion-icon name="film-outline"></ion-icon>
+            {{ grupo.chats.length }} castings en común
+          </p>
+        </div>
+      </div><!-- ── LISTA DE CASTINGS ──
+           Para 1 casting: siempre visible.
+           Para varios: desplegable controlado por expandido -->
+      <div class="castings-lista" [class.siempre-visible]="grupo.chats.length === 1"
+        [class.expandido]="grupo.chats.length > 1 && grupo.expandido">
+
+        <div class="casting-row" *ngFor="let chat of grupo.chats" (click)="abrirChat(chat)">
+          <!-- Icono casting -->
+          <div class="casting-row-icono">
+            <!-- Carrusel: múltiples imágenes -->
+            <ng-container *ngIf="getImagenes(chat).length > 1">
+              <img *ngFor="let img of getImagenes(chat); let i = index"
+                   [src]="getImgUrl(img)"
+                   class="casting-img-slide"
+                   [class.activa]="getSlideActivo(chat.matchId) === i" />
+              <div class="carrusel-dots-mini">
+                <span class="dot-mini" *ngFor="let img of getImagenes(chat); let i = index"
+                      [class.activo]="getSlideActivo(chat.matchId) === i"></span>
+              </div>
+            </ng-container>
+
+            <!-- 1 Imagen: Estática -->
+            <img *ngIf="getImagenes(chat).length === 1" [src]="getImgUrl(getImagenes(chat)[0])" class="casting-img-static" />
+            
+            <!-- Fallback -->
+            <ion-icon *ngIf="getImagenes(chat).length === 0" name="film-outline"></ion-icon>
+          </div>
+
+          <!-- Info -->
+          <div class="casting-row-info">
+            <p class="casting-row-titulo">{{ chat.scriptTitulo || 'Casting' }}</p>
+            <p class="casting-row-preview">
+              <span class="checkmarks" *ngIf="chat.noLeidos === 0 && esMioElUltimo(chat)">✓✓ </span>
+              <ion-icon name="mic-outline" class="audio-icon" *ngIf="chat.ultimoMensaje?.audioUrl"></ion-icon>
+              <span *ngIf="chat.ultimoMensaje?.audioUrl">Audio</span>
+              <span *ngIf="!chat.ultimoMensaje?.audioUrl">{{ chat.ultimoMensaje?.texto || '—' }}</span>
+            </p>
+          </div>
+
+          <!-- Hora + badge -->
+          <div class="casting-row-right">
+            <ion-icon [name]="chat.favorito ? 'star' : 'star-outline'" 
+                      class="chat-star-icon" 
+                      [class.activo]="chat.favorito"
+                      (click)="toggleChatFavorito(chat, $event)">
+            </ion-icon>
+            <span class="casting-row-hora">{{ formatHora(chat.ultimoMensaje?.createdAt) }}</span>
+            <div class="unread-badge small" *ngIf="chat.noLeidos > 0">{{ chat.noLeidos }}</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>

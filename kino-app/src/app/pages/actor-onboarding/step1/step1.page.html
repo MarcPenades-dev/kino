@@ -1,0 +1,132 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="btn-nav">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+        Atrás
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="step-label">PASO 1/2</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="saltar()" class="btn-skip">Omitir</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="setup-content">
+  <div class="setup-container">
+
+    <!-- TÍTULO -->
+    <div class="setup-header">
+      <h1 class="setup-titulo">Información Básica</h1>
+      <p class="setup-subtitulo">Que los directores de casting te conozcan.</p>
+    </div>
+
+    <!-- FOTO / HEADSHOT -->
+    <div class="headshot-section" (click)="cambiarFoto()">
+      <div class="headshot-circle">
+        <img *ngIf="fotoPreview" [src]="fotoPreview" class="headshot-img" />
+        <div *ngIf="!fotoPreview" class="headshot-placeholder">
+          <ion-icon name="add-outline" class="headshot-add-icon"></ion-icon>
+          <span class="headshot-label">FOTO PRINCIPAL</span>
+        </div>
+        <div class="headshot-overlay" *ngIf="fotoPreview">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+      </div>
+    </div>
+    <input
+      type="file"
+      #fileInput
+      accept="image/*"
+      style="display:none"
+      (change)="onFileSelected($event)"
+    />
+
+    <!-- FORMULARIO -->
+    <div class="form-section">
+
+      <!-- DISPLAY NAME -->
+      <div class="field-group">
+        <label class="field-label">NOMBRE VISIBLE</label>
+        <div class="field-wrap" [class.focused]="focusNombre">
+          <input
+            type="text"
+            [(ngModel)]="form.nombre"
+            placeholder="ej., Juan García"
+            class="field-input"
+            (focus)="focusNombre = true"
+            (blur)="focusNombre = false"
+          />
+        </div>
+      </div>
+
+      <!-- AGE + UNION STATUS -->
+      <div class="field-row">
+        <div class="field-group field-half">
+          <label class="field-label">EDAD</label>
+          <div class="field-wrap" [class.focused]="focusEdad">
+            <input
+              type="number"
+              [(ngModel)]="form.edad"
+              placeholder="25"
+              class="field-input"
+              min="16"
+              max="99"
+              (focus)="focusEdad = true"
+              (blur)="focusEdad = false"
+            />
+          </div>
+        </div>
+
+        <div class="field-group field-half">
+          <label class="field-label">ESTADO SINDICAL</label>
+          <div class="field-wrap select-wrap">
+            <select [(ngModel)]="form.unionStatus" class="field-select">
+              <option value="">Selecciona estado</option>
+              <option value="Union">Sindicado</option>
+              <option value="Non-Union">No Sindicado</option>
+              <option value="Fi-Core">Fi-Core</option>
+            </select>
+            <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFESSIONAL HEADLINE -->
+      <div class="field-group">
+        <label class="field-label">TITULAR PROFESIONAL</label>
+        <div class="field-wrap textarea-wrap" [class.focused]="focusBio">
+          <textarea
+            [(ngModel)]="form.bio"
+            placeholder="ej., Actor con formación teatral y experiencia en cine"
+            class="field-input field-textarea"
+            rows="3"
+            (focus)="focusBio = true"
+            (blur)="focusBio = false"
+          ></textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>
+
+<!-- FOOTER -->
+<ion-footer class="ion-no-border setup-footer">
+  <div class="footer-content">
+    <!-- VALIDACIÓN -->
+    <p class="error-msg" *ngIf="mostrarError">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      Por favor, rellena todos los campos para continuar.
+    </p>
+    <button
+      class="btn-next"
+      (click)="siguiente()"
+      [disabled]="guardando"
+    >
+      <ion-spinner *ngIf="guardando" name="crescent" color="light"></ion-spinner>
+      <span *ngIf="!guardando">Siguiente →</span>
+    </button>
+  </div>
+</ion-footer>

@@ -1,0 +1,165 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="back-btn">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="profile-content">
+
+  <!-- LOADING -->
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div *ngIf="!cargando && user" class="page-wrapper">
+
+    <!-- ── HERO ── -->
+    <div class="hero-section">
+      <div class="hero-bg-blur"></div>
+
+      <div class="hero-avatar-wrap">
+        <div class="hero-avatar">
+          <img *ngIf="user?.foto" [src]="getImgUrl(user.foto)" />
+          <div *ngIf="!user?.foto" class="avatar-inicial">
+            {{ getInitial(user?.nombre) }}
+          </div>
+        </div>
+        <div class="avatar-verified">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </div>
+      </div>
+
+      <h1 class="hero-nombre">
+        {{ user?.nombre }}<span class="hero-edad" *ngIf="user?.edad">, {{ user.edad }}</span>
+      </h1>
+
+      <div class="hero-rol-chip">
+        <ion-icon [name]="user?.rol === 'actor' ? 'person-outline' : 'film-outline'"></ion-icon>
+        <span>{{ user?.rol === 'actor' ? 'Actor' : 'Director de Casting' }}</span>
+      </div>
+
+      <p class="hero-ubicacion" *ngIf="user?.ciudad">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ user.ciudad }}<ng-container *ngIf="user?.unionStatus"> · {{ user.unionStatus }}</ng-container></span>
+      </p>
+    </div>
+
+    <!-- ── BOTONES DE ACCIÓN ── -->
+    <div class="acciones-row">
+      <div class="accion-item" (click)="abrirRedSocial('instagram')">
+        <button class="accion-btn-circle instagram">
+          <ion-icon name="logo-instagram"></ion-icon>
+        </button>
+        <span class="accion-label">Instagram</span>
+      </div>
+      <div class="accion-item" (click)="abrirRedSocial('twitter')">
+        <button class="accion-btn-circle twitter">
+          <ion-icon name="logo-twitter"></ion-icon>
+        </button>
+        <span class="accion-label">Twitter</span>
+      </div>
+      <div class="accion-item" (click)="abrirRedSocial('tiktok')">
+        <button class="accion-btn-circle tiktok">
+          <ion-icon name="logo-tiktok"></ion-icon>
+        </button>
+        <span class="accion-label">TikTok</span>
+      </div>
+    </div>
+
+    <!-- ── STATS (solo actores) ── -->
+    <div class="stats-row" *ngIf="user?.rol === 'actor'">
+      <div class="stat-box">
+        <span class="stat-valor">{{ user?.generos?.length || 0 }}</span>
+        <span class="stat-label">Géneros</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-box">
+        <span class="stat-valor">{{ user?.portfolio?.length || 0 }}</span>
+        <span class="stat-label">Cartera</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-box">
+        <span class="stat-valor">{{ user?.edad || '—' }}</span>
+        <span class="stat-label">Edad</span>
+      </div>
+    </div>
+
+    <!-- ── BIOGRAFÍA ── -->
+    <div class="seccion" *ngIf="user?.bio">
+      <div class="seccion-header-line">
+        <h2 class="seccion-titulo">Biografía</h2>
+      </div>
+      <div class="bio-card">
+        <div class="bio-quote-mark">"</div>
+        <p class="bio-texto">{{ user.bio }}</p>
+      </div>
+    </div>
+
+    <!-- ── INFORMACIÓN (guionista/director) ── -->
+    <div class="seccion" *ngIf="user?.rol !== 'actor'">
+      <div class="seccion-header-line">
+        <h2 class="seccion-titulo">Información</h2>
+      </div>
+      <div class="info-card">
+        <div class="info-fila">
+          <div class="info-left">
+            <ion-icon name="business-outline" class="info-icon"></ion-icon>
+            <span class="info-label">AGENCIA</span>
+          </div>
+          <span class="info-valor">{{ user?.agencia || 'Independiente' }}</span>
+        </div>
+        <div class="info-divider"></div>
+        <div class="info-fila">
+          <div class="info-left">
+            <ion-icon name="location-outline" class="info-icon"></ion-icon>
+            <span class="info-label">UBICACIÓN</span>
+          </div>
+          <span class="info-valor">{{ user?.ciudad || 'Sin especificar' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GÉNEROS INTERESADOS (actor) ── -->
+    <div class="seccion" *ngIf="user?.rol === 'actor' && user?.generos?.length > 0">
+      <div class="seccion-header-line">
+        <h2 class="seccion-titulo">Géneros</h2>
+      </div>
+      <div class="generos-wrap">
+        <span class="genero-chip" *ngFor="let g of user.generos">{{ g }}</span>
+      </div>
+    </div>
+
+    <!-- ── PORTFOLIO (actor) ── -->
+    <div class="seccion" *ngIf="user?.rol === 'actor' && user?.portfolio?.length > 0">
+      <div class="seccion-header-line">
+        <h2 class="seccion-titulo">Portfolio</h2>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-item" *ngFor="let item of user.portfolio" (click)="abrirItem(item)">
+          <div class="portfolio-thumb">
+            <img *ngIf="item.tipo === 'foto' && item.url" [src]="getImgUrl(item.url)" class="portfolio-img" />
+            <ion-icon *ngIf="item.tipo !== 'foto' || !item.url" [name]="item.tipo === 'video' ? 'play-circle-outline' :
+                              item.tipo === 'link' ? 'link-outline' : 'image-outline'">
+            </ion-icon>
+          </div>
+          <span class="portfolio-label">{{ item.titulo || item.tipo }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOTÓN GUARDAR ── -->
+    <div class="seccion contactar-seccion">
+      <button class="btn-contactar" (click)="toggleGuardar()">
+        <ion-icon [name]="estaGuardado ? 'bookmark' : 'bookmark-outline'"></ion-icon>
+        {{ estaGuardado ? 'Guardado' : 'Guardar' }}
+      </button>
+    </div>
+
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>

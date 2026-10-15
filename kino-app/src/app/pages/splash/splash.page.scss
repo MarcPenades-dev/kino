@@ -1,0 +1,136 @@
+$naranja: #FF6D00;
+$naranja-light: #FF8A3D;
+$fondo: #0A0A0A;
+$blanco: #FFFFFF;
+$gris: #888888;
+
+.splash-content {
+  --background: #{$fondo};
+}
+
+.splash-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  padding: 40px 24px;
+  background: radial-gradient(
+      ellipse at 50% 40%,
+      rgba($naranja, 0.08) 0%,
+      transparent 70%
+  );
+}
+
+
+.logo-wrap {
+  position: relative;
+  width: 300px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba($naranja, 0.2);
+  animation: expandir 2.5s ease-out infinite;
+
+  &.ring-1 {
+    width: 200px;
+    height: 200px;
+    animation-delay: 0s;
+  }
+
+  &.ring-2 {
+    width: 240px;
+    height: 240px;
+    animation-delay: 0.4s;
+  }
+
+  &.ring-3 {
+    width: 280px;
+    height: 280px;
+    animation-delay: 0.8s;
+  }
+}
+
+.logo-img-wrap {
+  position: relative;
+  z-index: 1;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: aparecer 0.8s ease-out both;
+  border: 2px solid rgba($naranja, 0.3);
+  background: rgba($naranja, 0.05);
+}
+
+.logo-img {
+  width: 130%;
+  height: 130%;
+  object-fit: cover;
+  object-position: center;
+  filter: drop-shadow(0 0 24px rgba($naranja, 0.35));
+  animation: pulsar 3s ease-in-out infinite 0.8s;
+}
+
+
+.loading-wrap {
+  width: 100%;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: aparecer 0.6s ease-out 0.8s both;
+}
+
+.loading-bar {
+  height: 3px;
+  background: rgba($blanco, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $naranja, $naranja-light);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.loading-text {
+  color: $gris;
+  font-size: 0.75rem;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.5px;
+  min-height: 18px;
+}
+
+
+@keyframes aparecer {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulsar {
+  0%, 100% {
+    filter: drop-shadow(0 0 24px rgba($naranja, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 40px rgba($naranja, 0.6));
+  }
+}
+
+@keyframes expandir {
+  0% { opacity: 0.5; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(1); }
+}

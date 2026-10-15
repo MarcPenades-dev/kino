@@ -1,0 +1,284 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="btn-back">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Elenco</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="btn-more" (click)="abrirOpciones()">
+        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="content-profesional">
+
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="hero-gradient"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <ion-icon name="radio-button-on-outline"></ion-icon>
+        <span>CASTING ACTIVO</span>
+      </div>
+
+      <h1 class="hero-titulo">{{ scriptTitulo }}</h1>
+      <p class="hero-description">
+        Revisa y gestiona el elenco final seleccionado para este proyecto.
+      </p>
+
+      <div class="stats-line">
+        <div class="stat-item">
+          <span class="stat-value">{{ actores.length }}</span>
+          <span class="stat-label">Actores</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ getProgressPercentage() }}%</span>
+          <span class="stat-label">Progreso</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">15</span>
+          <span class="stat-label">Objetivo</span>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+        <div class="progress-labels">
+          <span class="progress-label">Pre-producción</span>
+          <span class="progress-label">Finalización</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn-action secondary" (click)="verDetallesCasting()">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <span>Ver Detalles</span>
+        </button>
+        <button class="btn-action primary" (click)="buscarMasActores()">
+          <ion-icon name="search-outline"></ion-icon>
+          <span>Buscar Más</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">
+      <ion-icon name="star-outline"></ion-icon>
+      Actores del Proyecto
+    </h2>
+    <div class="section-badge">{{ actores.length }} / 15</div>
+  </div>
+
+  <div class="loading-container" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+    <span>Cargando elenco...</span>
+  </div>
+
+  <div class="empty-container" *ngIf="!cargando && actores.length === 0">
+    <div class="empty-icon">
+      <ion-icon name="people-outline"></ion-icon>
+    </div>
+    <h3 class="empty-title">Sin actores aún</h3>
+    <p class="empty-description">
+      Comienza a construir tu elenco seleccionando actores para este casting.
+    </p>
+    <button class="btn-add-first" (click)="buscarMasActores()">
+      <ion-icon name="search-outline"></ion-icon>
+      <span>Descubrir Actores</span>
+    </button>
+  </div>
+
+  <div class="actors-list" *ngIf="!cargando && actores.length > 0">
+    <div
+      class="actor-card-modern"
+      *ngFor="let a of actores; let i = index"
+      [style.animation-delay]="i * 80 + 'ms'"
+    >
+
+      <div class="actor-card-header">
+        <div class="actor-number-badge">
+          <span>{{ (i + 1).toString().padStart(2, '0') }}</span>
+        </div>
+
+        <div class="actor-avatar">
+          <img *ngIf="$any(a)?.foto"
+               [src]="getImgUrl($any(a).foto)"
+               [alt]="$any(a)?.nombre" />
+          <div *ngIf="!$any(a)?.foto" class="avatar-initial">
+            {{ getInitial($any(a)?.nombre) }}
+          </div>
+          <div class="avatar-status-dot"></div>
+        </div>
+
+        <div class="actor-main-info">
+          <h3 class="actor-name">{{ $any(a)?.nombre || 'Actor' }}</h3>
+          <p class="actor-location" *ngIf="$any(a)?.ciudad">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ $any(a).ciudad }}
+          </p>
+          <p class="actor-location" *ngIf="!$any(a)?.ciudad">Sin ubicación</p>
+        </div>
+
+        <div class="actor-union-badge" *ngIf="$any(a)?.unionStatus">
+          {{ $any(a).unionStatus }}
+        </div>
+      </div>
+
+      <div class="actor-bio-section">
+        <p class="actor-bio-text">
+          {{ $any(a)?.bio || 'Sin descripción disponible' }}
+        </p>
+      </div>
+
+      <div class="actor-generos" *ngIf="$any(a)?.generos?.length > 0">
+        <span class="genero-tag" *ngFor="let g of $any(a).generos | slice:0:3">
+          {{ g }}
+        </span>
+      </div>
+
+      <div class="callback-info-card" *ngIf="getMatchDeActor($any(a)._id)?.fechaCallback">
+        <div class="callback-info-row">
+          <ion-icon name="calendar-outline" class="callback-info-icon"></ion-icon>
+          <span class="callback-info-fecha">
+            {{ getMatchDeActor($any(a)._id)?.fechaCallback | date:'d MMM y' }}
+          </span>
+          <span class="callback-info-hora">
+            {{ getMatchDeActor($any(a)._id)?.horaCallback }}
+          </span>
+          <span class="callback-info-badge">Callback programado</span>
+        </div>
+        <p class="callback-info-notas" *ngIf="getMatchDeActor($any(a)._id)?.notasCallback">
+          <ion-icon name="document-text-outline"></ion-icon>
+          {{ getMatchDeActor($any(a)._id)?.notasCallback }}
+        </p>
+      </div>
+
+      <div class="actor-card-footer">
+        <button class="action-btn view" (click)="verPerfil($any(a)._id)">
+          <ion-icon name="person-outline"></ion-icon>
+          <span>Ver perfil</span>
+        </button>
+        <div class="action-divider"></div>
+        <button class="action-btn chat" (click)="irAlChat($any(a)._id, $event)">
+          <ion-icon name="chatbubble-outline"></ion-icon>
+          <span>Chat</span>
+        </button>
+        <div class="action-divider"></div>
+        <button class="action-btn callback" (click)="abrirModalCallback($any(a), $event)">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>Callback</span>
+        </button>
+        <div class="action-divider"></div>
+        <button class="action-btn remove" (click)="quitarActor($any(a)._id, $event)">
+          <ion-icon name="trash-outline"></ion-icon>
+          <span>Quitar</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" *ngIf="mostrarModalCallback" (click)="cerrarModalCallback()"></div>
+
+<!-- MODAL CALLBACK -->
+<div class="modal-callback" *ngIf="mostrarModalCallback">
+  <div class="modal-header">
+    <h3 class="modal-titulo">Programar Callback</h3>
+    <button class="modal-close" (click)="cerrarModalCallback()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="modal-actor-info" *ngIf="actorSeleccionado">
+      <div class="modal-actor-avatar">
+        <img *ngIf="actorSeleccionado.foto"
+             [src]="getImgUrl(actorSeleccionado.foto)" />
+        <div *ngIf="!actorSeleccionado.foto" class="modal-avatar-inicial">
+          {{ getInitial(actorSeleccionado.nombre) }}
+        </div>
+      </div>
+      <div>
+        <p class="modal-actor-nombre">{{ actorSeleccionado.nombre }}</p>
+        <p class="modal-actor-sub">Programar fecha de callback</p>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Fecha
+      </label>
+      <input
+        type="date"
+        [(ngModel)]="callbackForm.fecha"
+        class="modal-input"
+        [min]="hoyString"
+      />
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">
+        <ion-icon name="time-outline"></ion-icon>
+        Hora
+      </label>
+      <input
+        type="time"
+        [(ngModel)]="callbackForm.hora"
+        class="modal-input"
+      />
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">
+        <ion-icon name="document-text-outline"></ion-icon>
+        Notas para el actor (opcional)
+      </label>
+      <textarea
+        [(ngModel)]="callbackForm.notas"
+        class="modal-textarea"
+        placeholder="Ej: Prepara una escena de 2 minutos..."
+        rows="3"
+      ></textarea>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="modal-btn-cancelar" (click)="cerrarModalCallback()">
+      Cancelar
+    </button>
+    <button
+      class="modal-btn-guardar"
+      (click)="guardarCallback()"
+      [disabled]="!callbackForm.fecha || !callbackForm.hora || guardandoCallback"
+    >
+      <ion-spinner *ngIf="guardandoCallback" name="crescent" color="light"></ion-spinner>
+      <ion-icon *ngIf="!guardandoCallback" name="checkmark-outline"></ion-icon>
+      <span *ngIf="!guardandoCallback">Confirmar Callback</span>
+    </button>
+  </div>
+</div>

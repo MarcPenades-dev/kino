@@ -1,0 +1,129 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" class="btn-nav">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+        Atrás
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="step-label">PASO 2/2</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="saltar()" class="btn-skip">Omitir</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="setup-content">
+  <div class="setup-container">
+
+    <div class="setup-header">
+      <h1 class="setup-titulo">Preferencias y Portfolio</h1>
+      <p class="setup-subtitulo">Define tu estilo y muestra tu mejor trabajo.</p>
+    </div>
+
+    <!-- GÉNEROS -->
+    <div class="section">
+      <div class="section-header">
+        <label class="section-label">GÉNEROS DE INTERÉS</label>
+        <span class="section-hint">Selecciona varios</span>
+      </div>
+      <div class="generos-grid">
+        <div
+          class="genero-chip"
+          *ngFor="let g of generosDisponibles"
+          [class.activo]="generosSeleccionados.includes(g)"
+          (click)="toggleGenero(g)"
+        >{{ g }}</div>
+      </div>
+      <p class="error-msg" *ngIf="mostrarError && generosSeleccionados.length === 0">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        Selecciona al menos 1 género.
+      </p>
+    </div>
+
+
+    <div class="section">
+      <label class="section-label">AÑADE TU PORTFOLIO</label>
+
+
+      <div class="portfolio-option" (click)="addLink()">
+        <div class="portfolio-option-icon reel">
+          <ion-icon name="play-outline"></ion-icon>
+        </div>
+        <div class="portfolio-option-info">
+          <span class="portfolio-option-titulo">Subir Reel / Añadir Enlace</span>
+          <span class="portfolio-option-sub">Muestra tu rango interpretativo</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="portfolio-arrow"></ion-icon>
+      </div>
+
+      <!-- Browse file -->
+      <div class="portfolio-option" (click)="seleccionarArchivo()">
+        <div class="portfolio-option-icon file">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </div>
+        <div class="portfolio-option-info">
+          <span class="portfolio-option-titulo">Seleccionar archivo</span>
+          <span class="portfolio-option-sub">Foto o vídeo</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="portfolio-arrow"></ion-icon>
+      </div>
+      <input
+        type="file"
+        #fileInput
+        accept="image/*,video/*"
+        style="display:none"
+        (change)="onFileSelected($event)"
+      />
+
+
+      <div class="portfolio-option" (click)="seleccionarFoto()">
+        <div class="portfolio-option-icon foto">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+        <div class="portfolio-option-info">
+          <span class="portfolio-option-titulo">Añadir una Foto</span>
+          <span class="portfolio-option-sub">Foto de perfil o de producción</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="portfolio-arrow"></ion-icon>
+      </div>
+      <input
+        type="file"
+        #fotoInput
+        accept="image/*"
+        style="display:none"
+        (change)="onFotoSelected($event)"
+      />
+
+      <!-- Lista de items añadidos -->
+      <div class="portfolio-lista" *ngIf="portfolioItems.length > 0">
+        <div class="portfolio-item" *ngFor="let item of portfolioItems; let i = index">
+          <div class="portfolio-item-icon">
+            <ion-icon [name]="item.tipo === 'link' ? 'link-outline' : item.tipo === 'video' ? 'play-outline' : 'image-outline'"></ion-icon>
+          </div>
+          <div class="portfolio-item-info">
+            <span class="portfolio-item-titulo">{{ item.titulo || item.url }}</span>
+            <span class="portfolio-item-tipo">{{ item.tipo | titlecase }}</span>
+          </div>
+          <button class="btn-quitar" (click)="quitarItem(i)">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- FOOTER -->
+<ion-footer class="ion-no-border setup-footer">
+  <div class="footer-content">
+    <button class="btn-finish" (click)="finalizar()" [disabled]="guardando">
+      <ion-spinner *ngIf="guardando" name="crescent" color="light"></ion-spinner>
+      <span *ngIf="!guardando">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Finalizar
+      </span>
+    </button>
+  </div>
+</ion-footer>

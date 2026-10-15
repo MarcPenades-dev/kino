@@ -1,0 +1,282 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Perfil</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAChats()">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="profile-content">
+
+  <!-- HERO CON FONDO SELECCIONABLE -->
+  <div class="hero-section">
+
+    <div class="hero-bg-layer"
+      [style.background-image]="fondoActual.img ? 'url(' + fondoActual.img + ')' : fondoActual.css"
+      [style.background]="!fondoActual.img ? fondoActual.css : null">
+    </div>
+    <div class="hero-overlay"></div>
+
+    <button class="btn-cambiar-fondo" (click)="mostrarSelectorFondo = !mostrarSelectorFondo">
+      <ion-icon name="color-palette-outline"></ion-icon>
+    </button>
+
+    <div class="fondo-selector" *ngIf="mostrarSelectorFondo">
+      <p class="fondo-selector-titulo">Elige tu fondo</p>
+      <div class="fondo-options">
+        <div class="fondo-option" *ngFor="let fondo of fondosDisponibles"
+          [style.background-image]="fondo.img ? 'url(' + fondo.img + ')' : null"
+          [style.background]="!fondo.img ? fondo.css : null" [class.activo]="fondoActual.id === fondo.id"
+          (click)="seleccionarFondo(fondo)">
+          <ion-icon name="checkmark-outline" *ngIf="fondoActual.id === fondo.id"></ion-icon>
+          <span class="fondo-label">{{ fondo.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AVATAR -->
+    <div class="hero-avatar-wrap" (click)="irAEditar()">
+      <div class="hero-avatar">
+        <img *ngIf="user?.foto" [src]="getImgUrl(user.foto)" />
+        <div *ngIf="!user?.foto" class="avatar-inicial">
+          {{ getInitial(user?.nombre) }}
+        </div>
+      </div>
+      <div class="avatar-camera-badge">
+        <ion-icon name="camera-outline"></ion-icon>
+      </div>
+    </div>
+
+    <h1 class="hero-nombre">
+      {{ user?.nombre || 'Actor' }}
+      <span class="hero-edad" *ngIf="user?.edad">, {{ user.edad }}</span>
+    </h1>
+
+    <p class="hero-ubicacion" *ngIf="user?.ciudad">
+      <ion-icon name="location-outline"></ion-icon>
+      {{ user.ciudad }}
+      <span class="hero-union" *ngIf="user?.unionStatus">
+        · {{ user.unionStatus }}
+      </span>
+    </p>
+
+    <button class="btn-edit" (click)="irAEditar()">
+      <ion-icon name="create-outline"></ion-icon> Editar Perfil
+    </button>
+  </div>
+
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="stat-valor">{{ totalReels }}</span>
+      <span class="stat-label">Reels</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-box">
+      <span class="stat-valor">{{ totalFotos }}</span>
+      <span class="stat-label">Fotos</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-box">
+      <span class="stat-valor">{{ totalApps }}</span>
+      <span class="stat-label">Candidaturas</span>
+    </div>
+  </div>
+
+  <!-- BIO -->
+  <div class="seccion">
+    <h2 class="seccion-titulo">Biografía Profesional</h2>
+    <div class="bio-card">
+      <p class="bio-texto">
+        {{ user?.bio || 'Añade una bio profesional para que los directores de casting te conozcan mejor.' }}
+      </p>
+      <button class="btn-editar-bio" (click)="irAEditar()">
+        <ion-icon name="create-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- GÉNEROS -->
+  <div class="seccion" *ngIf="user?.generos?.length > 0">
+    <h2 class="seccion-titulo">Géneros Interesados</h2>
+    <div class="generos-wrap">
+      <span class="genero-chip" *ngFor="let g of user.generos">{{ g }}</span>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="seccion">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Portfolio y Media</h2>
+      <button class="btn-add-media" (click)="mostrarPickerMedia = true">
+        <ion-icon name="add-outline"></ion-icon>
+        Añadir Media
+      </button>
+    </div>
+
+    <div class="portfolio-empty" *ngIf="!user?.portfolio?.length">
+      <div class="portfolio-empty-grid">
+        <div class="portfolio-placeholder" (click)="irAEditar()">
+          <ion-icon name="play-circle-outline"></ion-icon>
+          <span>Reel de Acción</span>
+        </div>
+        <div class="portfolio-placeholder" (click)="irAEditar()">
+          <ion-icon name="play-circle-outline"></ion-icon>
+          <span>Monólogo Dramático</span>
+        </div>
+        <div class="portfolio-placeholder foto" (click)="irAEditar()">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+        <div class="portfolio-placeholder foto" (click)="irAEditar()">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-grid" *ngIf="user?.portfolio?.length > 0">
+      <div class="portfolio-item" *ngFor="let item of user.portfolio; let i = index"
+        (click)="gestionarPortfolioItem(item, i)">
+        <div class="portfolio-thumb">
+          <img *ngIf="item.tipo === 'foto' && item.url" [src]="getImgUrl(item.url)" class="portfolio-img" />
+          <ion-icon *ngIf="item.tipo !== 'foto' || !item.url" [name]="item.tipo === 'video' ? 'play-circle-outline' :
+                    item.tipo === 'link' ? 'link-outline' : 'image-outline'"></ion-icon>
+        </div>
+        <span class="portfolio-label">{{ item.titulo || item.tipo }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASTINGS GUARDADOS -->
+  <div class="seccion" *ngIf="guardados.length > 0">
+    <div class="seccion-header">
+      <h2 class="seccion-titulo">Castings Favoritos</h2>
+      <span class="seccion-count">{{ guardados.length }}</span>
+    </div>
+    <div class="guardados-lista">
+      <div class="guardado-item" *ngFor="let g of guardados" (click)="verDetalleCasting(g._id)">
+        <div class="guardado-thumb">
+          <img *ngIf="g.imagenUrl" [src]="g.imagenUrl" class="guardado-img" />
+          <div *ngIf="!g.imagenUrl" class="guardado-placeholder">
+            <ion-icon name="film-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="guardado-info">
+          <h3 class="guardado-titulo">{{ g.titulo }}</h3>
+          <p class="guardado-director">
+            Dir. {{ g.guionista?.nombre || 'Desconocido' }}
+          </p>
+          <div class="guardado-tags">
+            <span class="guardado-tag" *ngFor="let gen of getGeneros(g.genero) | slice:0:2">
+              {{ gen }}
+            </span>
+          </div>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="guardado-arrow"></ion-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERFILES GUARDADOS -->
+  <div class="seccion" *ngIf="perfilesGuardados.length > 0">
+    <div class="seccion-header-line" style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+      <ion-icon name="bookmark" style="color: #FF6D00; font-size: 1.2rem;"></ion-icon>
+      <h2 class="seccion-titulo" style="margin: 0;">Perfiles Guardados</h2>
+      <span style="margin-left: auto; font-size: 0.8rem; color: #888; font-weight: 600;">{{ perfilesGuardados.length
+        }}</span>
+    </div>
+
+    <div class="guardados-horizontal-scroll"
+      style="display: flex; overflow-x: auto; gap: 16px; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+      <style>
+        .guardados-horizontal-scroll::-webkit-scrollbar {
+          display: none;
+        }
+      </style>
+
+      <div class="guardado-story-card" *ngFor="let p of perfilesGuardados" (click)="verPerfilGuardado(p._id)"
+        style="display: flex; flex-direction: column; align-items: center; width: 70px; flex-shrink: 0; scroll-snap-align: start; cursor: pointer; transition: transform 0.2s;"
+        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'"
+        onmouseleave="this.style.transform='scale(1)'">
+        <div class="story-avatar-ring"
+          style="width: 68px; height: 68px; border-radius: 50%; padding: 2px; background: linear-gradient(135deg, #FF6D00, #ff9900, #4a4a4a); margin-bottom: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+          <div class="story-avatar-inner"
+            style="width: 100%; height: 100%; border-radius: 50%; border: 2.5px solid #121212; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center;">
+            <img *ngIf="p.foto" [src]="getImgUrl(p.foto)" style="width: 100%; height: 100%; object-fit: cover;" />
+            <span *ngIf="!p.foto" style="color: #FF6D00; font-weight: 800; font-size: 1.3rem;">{{ getInitial(p.nombre)
+              }}</span>
+          </div>
+        </div>
+        <span
+          style="font-size: 0.75rem; font-weight: 700; color: #fff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">{{
+          p.nombre.split(' ')[0] }}</span>
+        <span
+          style="font-size: 0.6rem; color: rgba(255,255,255,0.5); text-align: center; font-weight: 600; text-transform: uppercase; margin-top: 1px;">{{
+          p.rol === 'actor' || p.rol === 'actriz' ? 'Actor' : 'Director' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERRAR SESIÓN -->
+  <div class="seccion">
+    <button class="btn-logout" (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Cerrar Sesión
+    </button>
+
+    <button class="btn-delete-account" (click)="eliminarCuenta()">
+      <ion-icon name="trash-outline"></ion-icon>
+      Eliminar Cuenta
+    </button>
+  </div>
+
+  <div class="bottom-spacer"></div>
+
+  <input #inputVideo type="file" accept="video/*" style="display:none"
+    (change)="onArchivoSeleccionado($event, 'video')" />
+  <input #inputFoto type="file" accept="image/*" style="display:none"
+    (change)="onArchivoSeleccionado($event, 'foto')" />
+
+</ion-content>
+
+
+<div class="media-picker-overlay" *ngIf="mostrarPickerMedia" (click)="mostrarPickerMedia = false">
+  <div class="media-picker-sheet" (click)="$event.stopPropagation()">
+    <div class="media-picker-handle"></div>
+    <h3 class="media-picker-titulo">¿Qué deseas añadir?</h3>
+    <p class="media-picker-sub">Selecciona el tipo de contenido para tu portfolio</p>
+
+    <div class="media-picker-options">
+      <button class="media-picker-btn video" (click)="elegirMedia('video')">
+        <div class="media-picker-icon-wrap">
+          <ion-icon name="videocam-outline"></ion-icon>
+        </div>
+        <div class="media-picker-info">
+          <span class="media-picker-label">Video</span>
+          <span class="media-picker-desc">Reel, monólogo o escena</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="media-picker-arrow"></ion-icon>
+      </button>
+
+      <button class="media-picker-btn foto" (click)="elegirMedia('foto')">
+        <div class="media-picker-icon-wrap">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+        <div class="media-picker-info">
+          <span class="media-picker-label">Foto</span>
+          <span class="media-picker-desc">Fotografía profesional o headshot</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="media-picker-arrow"></ion-icon>
+      </button>
+    </div>
+
+    <button class="media-picker-cancelar" (click)="mostrarPickerMedia = false">Cancelar</button>
+  </div>
+</div>

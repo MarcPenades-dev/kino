@@ -1,0 +1,61 @@
+<div class="panel-overlay" (click)="cerrar()"></div>
+
+<div class="panel">
+
+  <div class="panel-header">
+    <h2 class="panel-titulo">Notificaciones</h2>
+    <button class="btn-marcar-todas" (click)="marcarTodas()" *ngIf="totalNoLeidas > 0">
+      Marcar todas como leídas
+    </button>
+  </div>
+
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+
+  <div class="empty-state" *ngIf="!cargando && noLeidas.length === 0">
+    <div class="empty-icon-wrap">
+      <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+    <p class="empty-titulo">Todo al día</p>
+    <p class="empty-sub">No tienes notificaciones pendientes.</p>
+  </div>
+
+
+  <div class="notif-lista" *ngIf="!cargando && noLeidas.length > 0">
+    <div
+      class="notif-item"
+      *ngFor="let n of noLeidas"
+      (click)="abrirNotificacion(n)"
+    >
+
+      <div class="notif-avatar-wrap">
+        <div class="notif-avatar" [ngClass]="'tipo-' + n.tipo">
+          <img
+            *ngIf="n.usuarioFoto"
+            [src]="apiUrl + '/' + n.usuarioFoto"
+            class="avatar-img"
+          />
+          <span *ngIf="!n.usuarioFoto">
+            {{ getInitial(n.usuarioNombre) }}
+          </span>
+        </div>
+        <div class="notif-tipo-badge" [ngClass]="'badge-' + n.tipo">
+          <ion-icon [name]="getIcono(n.tipo)"></ion-icon>
+        </div>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="notif-body">
+        <p class="notif-titulo" [class.bold]="!n.leida">{{ n.titulo }}</p>
+        <p class="notif-sub">{{ n.subtitulo }}</p>
+        <p class="notif-fecha">{{ formatFecha(n.fecha) }}</p>
+      </div>
+
+
+      <div class="notif-dot" *ngIf="!n.leida"></div>
+    </div>
+  </div>
+
+</div>

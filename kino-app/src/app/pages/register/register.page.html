@@ -1,0 +1,50 @@
+<ion-content>
+  <canvas class="stars-canvas" #starsCanvas></canvas>
+
+  <div class="content-wrap ion-padding">
+    <div class="logo-container">
+      <img src="assets/logo-kino.jpeg" alt="KINO" class="logo-img" />
+      <p class="subtitulo">Crea tu cuenta y empieza</p>
+    </div>
+
+    <div class="form-container">
+      <div class="campo">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="nombre" placeholder="Tu nombre" />
+      </div>
+      <div class="campo">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="email" placeholder="tu@email.com" />
+      </div>
+      <div class="campo">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="password" placeholder="••••••••" />
+      </div>
+      <div class="campo">
+        <label>Rol</label>
+        <div class="rol-selector">
+          <button [class.activo]="rol === 'actor'" (click)="rol = 'actor'">Actor</button>
+          <button [class.activo]="rol === 'guionista'" (click)="rol = 'guionista'">Director de Casting</button>
+        </div>
+      </div>
+
+      <div class="campo" *ngIf="rol === 'guionista'">
+        <label>Código de acceso</label>
+        <input type="password" [(ngModel)]="codigoGuionista" placeholder="Codigo acceso exclusivo directores" />
+      </div>
+
+      <div *ngIf="error">
+        <p class="error-text">{{ error }}</p>
+      </div>
+
+      <button class="btn-entrar" (click)="register()">
+        <ion-spinner *ngIf="cargando" name="crescent"></ion-spinner>
+        <span *ngIf="!cargando">Crear cuenta</span>
+      </button>
+
+      <p class="login-link">
+        ¿Ya tienes cuenta? <span (click)="irALogin()">Inicia sesión</span>
+      </p>
+    </div>
+  </div>
+</ion-content>

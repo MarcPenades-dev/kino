@@ -1,0 +1,151 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Mis Castings</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAChats()">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="apps-content">
+
+  <div class="filtro-tabs">
+    <button
+      class="filtro-btn"
+      [class.activo]="filtroActual === 'all'"
+      (click)="setFiltro('all')"
+    >
+      Todos
+      <span class="filtro-count" *ngIf="matches.length > 0">{{ matches.length }}</span>
+    </button>
+    <button
+      class="filtro-btn"
+      [class.activo]="filtroActual === 'pending'"
+      (click)="setFiltro('pending')"
+    >
+      Pendientes
+      <span class="filtro-count pending" *ngIf="pendientes.length > 0">
+        {{ pendientes.length }}
+      </span>
+    </button>
+    <button
+      class="filtro-btn"
+      [class.activo]="filtroActual === 'accepted'"
+      (click)="setFiltro('accepted')"
+    >
+      Aceptados
+    </button>
+  </div>
+
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div class="empty-state" *ngIf="!cargando && matchesFiltrados.length === 0">
+    <ion-icon name="document-outline" class="empty-icon"></ion-icon>
+    <p class="empty-titulo">Aún no tienes candidaturas</p>
+    <p class="empty-sub">
+      {{ filtroActual === 'accepted' ? 'Todavía no tienes candidaturas aceptadas.' :
+      filtroActual === 'pending' ? 'No tienes candidaturas pendientes.' :
+        '¡Empieza a aplicar a castings desde el inicio!' }}
+    </p>
+    <button class="btn-explorar" (click)="irAlFeed()" *ngIf="filtroActual === 'all'">
+      <ion-icon name="search-outline"></ion-icon>
+      Explorar Castings
+    </button>
+  </div>
+
+  <div class="apps-lista" *ngIf="!cargando && matchesFiltrados.length > 0">
+
+    <div
+      class="app-card"
+      *ngFor="let m of matchesFiltrados"
+      (click)="verDetalle(m)"
+      [class.aceptado]="m.estado === 'aceptado'"
+      [class.rechazado]="m.estado === 'rechazado'"
+    >
+
+      <!-- ACEPTADO -->
+      <div *ngIf="m.estado === 'aceptado'" class="card-aceptado-wrap">
+        <div class="card-img-wrap">
+          <img *ngIf="m.script?.imagenUrl" [src]="m.script.imagenUrl" class="card-img" />
+          <div *ngIf="!m.script?.imagenUrl" class="card-img-placeholder"></div>
+          <div class="card-img-gradient"></div>
+          <div class="badge-aceptado-overlay">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            ACEPTADO
+          </div>
+        </div>
+        <div class="card-aceptado-body">
+          <p class="card-congrats">
+            <ion-icon name="star-outline"></ion-icon>
+            ¡Enhorabuena — Seleccionado para el casting!
+          </p>
+          <h2 class="card-titulo-big">{{ m.script?.titulo || 'Sin título' }}</h2>
+          <p class="card-meta-line">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            Dir. {{ m.script?.guionista?.nombre || 'Director' }}
+          </p>
+          <p class="card-meta-line">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <ng-container *ngIf="m.fechaCallback">
+              Audición: {{ m.fechaCallback | date:'d MMM y' }}
+              <span *ngIf="m.horaCallback">&nbsp;&middot;&nbsp;{{ m.horaCallback }}</span>
+            </ng-container>
+            <ng-container *ngIf="!m.fechaCallback">
+              <span class="fecha-por-definir">Fecha de audición: Por definir</span>
+            </ng-container>
+          </p>
+          <button class="btn-ver-callsheet">
+            Ver Detalles / Contactar Director →
+          </button>
+        </div>
+      </div>
+
+      <!-- PENDIENTE / RECHAZADO -->
+      <div *ngIf="m.estado !== 'aceptado'" class="card-compacta-wrap">
+        <div class="card-thumb">
+          <img *ngIf="m.script?.imagenUrl" [src]="m.script.imagenUrl" class="thumb-img" />
+          <div *ngIf="!m.script?.imagenUrl" class="thumb-placeholder">
+            <ion-icon name="film-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="card-compacta-info">
+          <div class="card-compacta-header">
+            <h3 class="card-titulo-compact">{{ m.script?.titulo || 'Sin título' }}</h3>
+            <span
+              class="estado-badge"
+              [class.pending]="m.estado === 'pendiente'"
+              [class.rejected]="m.estado === 'rechazado'"
+            >
+              {{ m.estado === 'pendiente' ? 'PENDIENTE' : 'RECHAZADO' }}
+            </span>
+          </div>
+          <p class="card-director-compact">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            Dir. {{ m.script?.guionista?.nombre || 'Director' }}
+          </p>
+          <p class="card-fecha-compact">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span class="fecha-por-definir">Aplicado: Por definir</span>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<app-notificaciones-panel
+  *ngIf="mostrarNotificaciones"
+  (cerrado)="mostrarNotificaciones = false"
+></app-notificaciones-panel>

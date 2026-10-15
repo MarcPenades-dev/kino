@@ -1,0 +1,172 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Agenda</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAChats()">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cal-content">
+
+  <!-- Spinner de carga -->
+  <div *ngIf="cargando" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando agenda...</p>
+  </div>
+
+  <div *ngIf="!cargando">
+
+    <!-- RESUMEN: días con más actividad -->
+    <div class="resumen-section" *ngIf="diasConMasActores.length > 0">
+      <h3 class="section-title">🔥 Próximas sesiones</h3>
+      <div class="resumen-scroll">
+        <div class="resumen-card" *ngFor="let d of diasConMasActores">
+          <div class="resumen-dia">{{ d.dia.getDate() }}</div>
+          <div class="resumen-mes">{{ mesesNombres[d.dia.getMonth()].slice(0,3) }}</div>
+          <div class="resumen-count">
+            <ion-icon name="people-outline"></ion-icon>
+            {{ d.count }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div class="calendario-card">
+      <!-- Navegación de mes -->
+      <div class="cal-nav">
+        <button class="nav-btn" (click)="mesAnterior()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </button>
+        <div class="cal-titulo">
+          <span class="mes-nombre">{{ nombreMes }}</span>
+          <span class="año">{{ anioActual }}</span>
+        </div>
+        <button class="nav-btn" (click)="mesSiguiente()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Cabecera días semana -->
+      <div class="dias-semana">
+        <div class="dia-semana" *ngFor="let d of diasSemana">{{ d }}</div>
+      </div>
+
+      <!-- Grid de días -->
+      <div class="semanas">
+        <div class="semana" *ngFor="let semana of semanas">
+          <div
+            *ngFor="let dia of semana"
+            class="dia-cell"
+            [class.vacio]="!dia"
+            [class.hoy]="esHoy(dia)"
+            [class.seleccionado]="esDiaSeleccionado(dia)"
+            [class.tiene-evento]="tieneActores(dia)"
+            (click)="seleccionarDia(dia)"
+          >
+            <span class="dia-num" *ngIf="dia">{{ dia.getDate() }}</span>
+            <span class="evento-count" *ngIf="tieneActores(dia) && !esDiaSeleccionado(dia)">
+              {{ contarActoresDia(dia) }}
+            </span>
+            <span class="evento-dot-sel" *ngIf="tieneActores(dia) && esDiaSeleccionado(dia)">
+              {{ contarActoresDia(dia) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETALLE DEL DÍA -->
+    <div class="detalle-dia" *ngIf="diaSeleccionado">
+      <div class="detalle-header">
+        <h3>📅 {{ formatearFecha(diaSeleccionado.toISOString()) }}</h3>
+        <span class="detalle-count" *ngIf="actoresDelDia.length > 0">
+          {{ actoresDelDia.length }} actor{{ actoresDelDia.length > 1 ? 'es' : '' }}
+        </span>
+      </div>
+
+      <!-- Sin actores ese día -->
+      <div class="sin-eventos" *ngIf="actoresDelDia.length === 0">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>No tienes actores programados este día</p>
+      </div>
+
+      <!-- Agrupados por casting -->
+      <div *ngFor="let grupo of actoresPorCasting" class="casting-grupo">
+        <!-- Título del casting -->
+        <div class="casting-titulo" *ngIf="grupo.script">
+          <ion-icon name="film-outline"></ion-icon>
+          <span>{{ grupo.script.titulo || 'Sin título' }}</span>
+          <span class="casting-count-badge">{{ grupo.actores.length }}</span>
+        </div>
+
+        <!-- Lista de actores de ese casting -->
+        <div class="actor-item" *ngFor="let m of grupo.actores; let i = index">
+          <!-- Timeline indicator -->
+          <div class="timeline">
+            <div class="timeline-hora">{{ m.horaCallback || '??:??' }}</div>
+            <div class="timeline-line" *ngIf="i < grupo.actores.length - 1"></div>
+          </div>
+
+          <!-- Card del actor -->
+          <div class="actor-card">
+            <!-- Avatar -->
+            <div class="actor-avatar" *ngIf="m.actor?.foto">
+              <img [src]="getImgUrl(m.actor.foto)" [alt]="m.actor?.nombre" />
+            </div>
+            <div class="actor-avatar actor-avatar-placeholder" *ngIf="!m.actor?.foto">
+              {{ getInitial(m.actor?.nombre) }}
+            </div>
+
+            <!-- Info -->
+            <div class="actor-info">
+              <div class="actor-nombre">{{ m.actor?.nombre || 'Actor desconocido' }}</div>
+              <div class="actor-meta">
+                <span *ngIf="m.actor?.ciudad">
+                  <ion-icon name="location-outline"></ion-icon>
+                  {{ m.actor.ciudad }}
+                </span>
+                <span *ngIf="m.actor?.edad">
+                  {{ m.actor.edad }} años
+                </span>
+              </div>
+              <div class="actor-notas" *ngIf="m.notasCallback">
+                📝 {{ m.notasCallback }}
+              </div>
+              <div class="actor-estado">
+                <span class="estado-pill" [class.confirmado]="m.disponibilidadConfirmada">
+                  <ion-icon [name]="m.disponibilidadConfirmada ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  {{ m.disponibilidadConfirmada ? 'Disponible' : 'Sin confirmar' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actor-acciones">
+              <button class="accion-btn chat-btn" (click)="irAlChat(m._id, $event)">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="matches.length === 0">
+      <div class="empty-icon">🎬</div>
+      <h3>Agenda vacía</h3>
+      <p>Cuando asignes fechas de casting a los actores aceptados, aparecerán aquí en tu agenda</p>
+    </div>
+
+  </div>
+
+</ion-content>

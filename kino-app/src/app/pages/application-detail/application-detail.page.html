@@ -1,0 +1,300 @@
+<ion-content class="detail-content">
+
+  <!-- HERO CON IMAGEN DEL CASTING -->
+  <div class="hero-wrap">
+    <div class="hero-bg">
+      <img *ngIf="match?.script?.imagenUrl" [src]="match.script.imagenUrl" class="hero-img" />
+      <div *ngIf="!match?.script?.imagenUrl" class="hero-placeholder"></div>
+      <div class="hero-gradient"></div>
+    </div>
+    <div class="hero-toolbar">
+      <button class="btn-back" (click)="volver()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="hero-bottom">
+      <div class="badge-accepted">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        ACEPTADO
+      </div>
+      <h1 class="hero-titulo">{{ match?.script?.titulo || 'Sin título' }}</h1>
+      <p class="hero-rol">
+        <ion-icon name="film-outline"></ion-icon>
+        {{ match?.script?.genero || 'Actor' }}
+      </p>
+    </div>
+  </div>
+
+  <div class="body" *ngIf="match">
+
+
+    <div class="seccion">
+      <h2 class="seccion-titulo">Estado Solicitud</h2>
+      <div class="timeline">
+
+        <ng-container *ngIf="dioLike">
+          <div class="timeline-item">
+            <div class="timeline-dot naranja">
+              <ion-icon name="heart"></ion-icon>
+            </div>
+            <div class="timeline-content">
+              <p class="timeline-label naranja">Like Guión</p>
+              <p class="timeline-fecha">{{ match.createdAt | date: 'MMMM d, y' }}</p>
+            </div>
+          </div>
+          <div class="timeline-linea naranja"></div>
+        </ng-container>
+
+        <div class="timeline-item">
+          <div class="timeline-dot naranja">
+            <ion-icon name="paper-plane-outline"></ion-icon>
+          </div>
+          <div class="timeline-content">
+            <p class="timeline-label naranja">Aplicado</p>
+            <p class="timeline-fecha">{{ match.createdAt | date: 'MMMM d, y' }}</p>
+          </div>
+        </div>
+        <div class="timeline-linea"
+             [class.naranja]="match.estado === 'aceptado'"
+             [class.pendiente]="match.estado === 'pendiente'"></div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"
+               [class.naranja]="match.estado === 'aceptado'"
+               [class.pendiente]="match.estado === 'pendiente'">
+            <ion-icon name="eye-outline"></ion-icon>
+          </div>
+          <div class="timeline-content">
+            <p class="timeline-label"
+               [class.naranja]="match.estado === 'aceptado'"
+               [class.pendiente]="match.estado === 'pendiente'">
+              Revisado por Casting
+            </p>
+            <p class="timeline-fecha" *ngIf="match.estado === 'aceptado'">
+              {{ match.updatedAt | date: 'MMMM d, y' }}
+            </p>
+            <p class="timeline-fecha" *ngIf="match.estado === 'pendiente'">Pendiente</p>
+          </div>
+        </div>
+        <div class="timeline-linea"
+             [class.verde]="match.estado === 'aceptado'"
+             [class.pendiente]="match.estado === 'pendiente'"></div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"
+               [class.verde]="match.estado === 'aceptado'"
+               [class.pendiente]="match.estado === 'pendiente'">
+            <ion-icon name="ellipse" *ngIf="match.estado === 'aceptado'"></ion-icon>
+            <ion-icon name="ellipse-outline" *ngIf="match.estado === 'pendiente'"></ion-icon>
+          </div>
+          <div class="timeline-content">
+            <p class="timeline-label"
+               [class.verde]="match.estado === 'aceptado'"
+               [class.pendiente]="match.estado === 'pendiente'">
+              Devolución de llamada solicitada
+            </p>
+            <p class="timeline-fecha" *ngIf="match.estado === 'aceptado'">
+              {{ match.updatedAt | date: 'MMMM d, y' }}
+            </p>
+            <p class="timeline-fecha" *ngIf="match.estado === 'pendiente'">Pendiente</p>
+          </div>
+        </div>
+        <div class="timeline-linea pendiente"></div>
+
+
+        <div class="timeline-item">
+          <div class="timeline-dot"
+               [class.verde]="match.fechaCallback"
+               [class.pendiente]="!match.fechaCallback">
+            <ion-icon name="ellipse-outline" *ngIf="!match.fechaCallback"></ion-icon>
+            <ion-icon name="checkmark-circle-outline" *ngIf="match.fechaCallback"></ion-icon>
+          </div>
+          <div class="timeline-content">
+            <p class="timeline-label"
+               [class.verde]="match.fechaCallback"
+               [class.pendiente]="!match.fechaCallback">
+              Fecha Confirmada
+            </p>
+            <p class="timeline-fecha" *ngIf="match.fechaCallback">
+              {{ match.fechaCallback | date: 'MMMM d, y' }} ({{ match.horaCallback }})
+            </p>
+            <p class="timeline-fecha" *ngIf="!match.fechaCallback">Pendiente</p>
+          </div>
+        </div>
+        <div class="timeline-linea"
+             [class.verde]="confirmado"
+             [class.pendiente]="!confirmado"></div>
+
+
+        <div class="timeline-item">
+          <div class="timeline-dot"
+               [class.verde]="confirmado"
+               [class.pendiente]="!confirmado">
+            <ion-icon name="ellipse-outline" *ngIf="!confirmado"></ion-icon>
+            <ion-icon name="person-circle-outline" *ngIf="confirmado"></ion-icon>
+          </div>
+          <div class="timeline-content">
+            <p class="timeline-label"
+               [class.verde]="confirmado"
+               [class.pendiente]="!confirmado">
+              Disponibilidad Confirmada
+            </p>
+            <p class="timeline-fecha" *ngIf="confirmado">Actor disponible</p>
+            <p class="timeline-fecha" *ngIf="!confirmado">Pendiente de confirmar</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+
+    <div class="seccion" *ngIf="match.estado === 'aceptado'">
+      <h2 class="seccion-titulo">
+        <ion-icon name="calendar-outline" class="seccion-icon"></ion-icon>
+        Devolución de llamada programada
+      </h2>
+      <div class="callback-card">
+
+
+        <div class="callback-item">
+          <div class="callback-icon-wrap fecha">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="callback-info">
+            <span class="callback-label">Fecha y Hora</span>
+            <span class="callback-valor" *ngIf="!match.fechaCallback">Por programar</span>
+            <span class="callback-sub" *ngIf="!match.fechaCallback">El director contactará contigo</span>
+            <span class="callback-valor fecha-confirmada" *ngIf="match.fechaCallback">
+              {{ match.fechaCallback | date: 'EEEE, d MMMM y' }}
+            </span>
+            <span class="callback-sub hora" *ngIf="match.fechaCallback">
+              <ion-icon name="time-outline"></ion-icon>
+              {{ match.horaCallback }}
+            </span>
+          </div>
+          <div class="fecha-badge" *ngIf="match.fechaCallback">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Confirmado
+          </div>
+        </div>
+
+        <div class="callback-divider"></div>
+
+
+        <div class="callback-item" *ngIf="match.notasCallback">
+          <div class="callback-icon-wrap notas">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div class="callback-info">
+            <span class="callback-label">Notas del Director</span>
+            <span class="callback-valor notas-texto">{{ match.notasCallback }}</span>
+          </div>
+        </div>
+        <div class="callback-divider" *ngIf="match.notasCallback"></div>
+
+        <!-- TIPO DE REVISIÓN -->
+        <div class="callback-item">
+          <div class="callback-icon-wrap tipo">
+            <ion-icon name="videocam-outline"></ion-icon>
+          </div>
+          <div class="callback-info">
+            <span class="callback-label">Tipo de revisión</span>
+            <div class="review-types">
+              <span class="review-type-chip chat">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+                Chat
+              </span>
+              <span class="review-type-chip video">
+                <ion-icon name="videocam-outline"></ion-icon>
+                Videollamada
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callback-divider"></div>
+
+        <!-- DIRECTOR -->
+        <div class="callback-item">
+          <div class="callback-avatar">
+            <img *ngIf="match?.script?.guionista?.foto"
+                 [src]="apiUrl + '/' + match.script.guionista.foto" />
+            <div *ngIf="!match?.script?.guionista?.foto" class="callback-avatar-inicial">
+              {{ getInitial(match?.script?.guionista?.nombre) }}
+            </div>
+          </div>
+          <div class="callback-info">
+            <span class="callback-label">Casting Director</span>
+            <span class="callback-valor">{{ match?.script?.guionista?.nombre || 'Director' }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider" *ngIf="match.estado === 'aceptado'"></div>
+
+    <!-- ACCIONES -->
+    <div class="seccion acciones-seccion" *ngIf="match.estado === 'aceptado'">
+      <button
+        class="btn-confirm"
+        [class.confirmado]="confirmado"
+        (click)="confirmarDisponibilidad()"
+        [disabled]="confirmado || guardandoConfirmacion"
+      >
+        <ion-spinner *ngIf="guardandoConfirmacion" name="crescent" color="light"></ion-spinner>
+        <ion-icon *ngIf="!guardandoConfirmacion"
+                  [name]="confirmado ? 'checkmark-circle-outline' : 'checkmark-outline'"></ion-icon>
+        <span *ngIf="!guardandoConfirmacion">
+          {{ confirmado ? '¡Disponibilidad Confirmada!' : 'Confirmar Disponibilidad' }}
+        </span>
+      </button>
+
+      <div class="contact-options">
+        <button class="btn-contact chat" (click)="irAlChat()">
+          <ion-icon name="chatbubble-outline"></ion-icon>
+          Mensajes Casting
+        </button>
+        <button class="btn-contact video" (click)="iniciarVideoLlamada()">
+          <ion-icon name="videocam-outline"></ion-icon>
+          Videollamada
+        </button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CONSEJOS -->
+    <div class="seccion">
+      <h2 class="seccion-titulo">
+        <ion-icon name="bulb-outline" class="seccion-icon tip-icon"></ion-icon>
+        Consejos profesionales para este puesto
+      </h2>
+      <div class="tips-lista">
+        <div class="tip-item">
+          <p class="tip-titulo">Repasa el guión</p>
+          <p class="tip-texto">
+            El director ha solicitado específicamente una lectura natural y contenida.
+            Céntrate en la verdad emocional por encima de la actuación.
+          </p>
+        </div>
+        <div class="tip-item">
+          <p class="tip-titulo">Configuración de iluminación</p>
+          <p class="tip-texto">
+            Para el callback virtual, asegúrate de tener una buena iluminación
+            frontal que resalte claramente tus expresiones faciales.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="centrado" *ngIf="cargando">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>

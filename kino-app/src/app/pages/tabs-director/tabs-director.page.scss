@@ -1,0 +1,44 @@
+// Colores de la app KINO
+$naranja: #FF6D00;
+$fondo: #121212;
+$borde: #2a2a2a;
+$blanco: #ffffff;
+$gris: #888888;
+
+ion-tab-bar {
+  --background: #{$fondo};
+  --border: 1px solid #{$borde};
+  background: $fondo;
+  border-top: 1px solid $borde;
+}
+
+ion-tab-button {
+  --color: #{$gris};
+  --color-selected: #{$naranja};
+  --background: #{$fondo};
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --ripple-color: transparent;
+
+  ion-icon {
+    font-size: 1.35rem;
+    transition: color 0.15s;
+  }
+
+  ion-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: color 0.15s;
+  }
+
+  &.tab-selected {
+    ion-icon { color: $naranja; }
+    ion-label { color: $naranja; }
+  }
+
+  &:not(.tab-selected) {
+    ion-icon { color: $gris; }
+    ion-label { color: $gris; }
+  }
+}

@@ -1,0 +1,141 @@
+<ion-header class="ion-no-border header-profesional">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <div class="header-title-content">
+        <img src="assets/logo-kino.jpeg" alt="KINO" class="header-logo" />
+        <span class="header-main-title">Buscar</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAChats()">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="search-wrap">
+    <div class="search-bar">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input
+        type="text"
+        [(ngModel)]="filtros.nombre"
+        (ngModelChange)="buscarConDebounce()"
+        placeholder="Buscar actores por nombre..."
+        class="search-input"
+      />
+      <button class="btn-clear" *ngIf="filtros.nombre" (click)="limpiarNombre()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="filtros-seccion">
+    <div class="filtros-header">
+      <span class="filtros-label">FILTROS</span>
+      <button class="btn-advanced" (click)="mostrarFiltrosAvanzados = !mostrarFiltrosAvanzados">
+        <ion-icon name="options-outline"></ion-icon>
+        Avanzado
+      </button>
+    </div>
+
+    <div class="filtros-chips">
+      <div class="filtro-select-wrap">
+        <ion-icon name="location-outline" class="filtro-chip-icon"></ion-icon>
+        <select [(ngModel)]="filtros.ciudad" (ngModelChange)="buscar()" class="filtro-select">
+          <option value="">Ubicación ▾</option>
+          <option value="Madrid">Madrid</option>
+          <option value="Barcelona">Barcelona</option>
+          <option value="Valencia">Valencia</option>
+          <option value="Sevilla">Sevilla</option>
+          <option value="New York">New York</option>
+          <option value="Los Angeles">Los Angeles</option>
+        </select>
+      </div>
+
+      <div class="filtro-select-wrap">
+        <ion-icon name="people-outline" class="filtro-chip-icon"></ion-icon>
+        <select [(ngModel)]="filtros.edad" (ngModelChange)="buscar()" class="filtro-select">
+          <option value="">Edad ▾</option>
+          <option value="18-25">18-25</option>
+          <option value="25-35">25-35</option>
+          <option value="35-50">35-50</option>
+          <option value="50-99">50+</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filtros-avanzados" *ngIf="mostrarFiltrosAvanzados">
+      <div class="avanzado-grupo">
+        <label class="avanzado-label">Géneros / Habilidades</label>
+        <div class="generos-chips">
+          <div
+            class="genero-chip"
+            *ngFor="let g of generosDisponibles"
+            [class.activo]="filtros.generos.includes(g)"
+            (click)="toggleGenero(g)"
+          >{{ g }}</div>
+        </div>
+      </div>
+      <button class="btn-limpiar" (click)="limpiarFiltros()">
+        <ion-icon name="refresh-outline"></ion-icon> Limpiar filtros
+      </button>
+    </div>
+  </div>
+
+  <div class="resultados-header" *ngIf="!cargando">
+    <span class="resultados-count">{{ actores.length }} resultados encontrados</span>
+  </div>
+
+  <div *ngIf="cargando" class="centrado">
+    <ion-spinner name="crescent" color="warning"></ion-spinner>
+  </div>
+
+  <div *ngIf="!cargando && actores.length === 0" class="empty-state">
+    <ion-icon name="people-outline" class="empty-icon"></ion-icon>
+    <p class="empty-titulo">Sin resultados</p>
+    <p class="empty-sub">Prueba con otros filtros o términos de búsqueda.</p>
+  </div>
+
+  <div class="actores-lista" *ngIf="!cargando && actores.length > 0">
+    <div class="actor-card" *ngFor="let a of actores">
+      <div class="actor-top">
+        <div class="actor-avatar">
+          <img *ngIf="a.foto" [src]="getImgUrl(a.foto)" />
+          <div *ngIf="!a.foto" class="avatar-inicial">{{ getInitial(a.nombre) }}</div>
+        </div>
+        <div class="actor-info">
+          <div class="actor-nombre-fila">
+            <h3 class="actor-nombre">{{ a.nombre }}<span *ngIf="a.edad">, {{ a.edad }}</span></h3>
+            <button class="btn-guardar-actor" (click)="toggleGuardarActor(a, $event)">
+              <ion-icon
+                [name]="actoresGuardadosIds.includes(a._id) ? 'bookmark' : 'bookmark-outline'"
+                [style.color]="actoresGuardadosIds.includes(a._id) ? '#FF6D00' : ''"
+              ></ion-icon>
+            </button>
+          </div>
+          <p class="actor-ubicacion" *ngIf="a.ciudad">
+            <ion-icon name="location-outline"></ion-icon> {{ a.ciudad }}
+          </p>
+          <p class="actor-bio">{{ a.bio || 'Sin descripción disponible' }}</p>
+        </div>
+      </div>
+
+      <div class="actor-tags" *ngIf="a.generos?.length > 0">
+        <span class="actor-tag" *ngFor="let t of a.generos">{{ t }}</span>
+      </div>
+
+      <button class="btn-ver-perfil" (click)="verPerfil(a._id)">
+        Ver Perfil
+      </button>
+    </div>
+  </div>
+
+</ion-content>

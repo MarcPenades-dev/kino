@@ -1,0 +1,287 @@
+
+$naranja: #FF6D00;
+$naranja-light: #FF8A3D;
+$fondo: #0A0A0A;
+$card: #141414;
+$borde: #2A2A2A;
+$blanco: #FFFFFF;
+$blanco-80: rgba(255,255,255,0.8);
+$blanco-50: rgba(255,255,255,0.5);
+$blanco-20: rgba(255,255,255,0.2);
+$gris: #888888;
+$rojo: #EB445A;
+$transicion: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+
+ion-toolbar {
+  --background: #{$fondo};
+  --color: #{$blanco};
+}
+
+.step-label {
+  color: $naranja;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.btn-nav {
+  --color: #{$blanco-80};
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  ion-icon { font-size: 1.1rem; }
+}
+
+.btn-skip {
+  --color: #{$gris};
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
+.setup-content {
+  --background: #{$fondo};
+}
+
+.setup-container {
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+
+.setup-header {
+  text-align: center;
+
+  .setup-titulo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $blanco;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .setup-subtitulo {
+    font-size: 0.9rem;
+    color: $gris;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+
+.headshot-section {
+  display: flex;
+  justify-content: center;
+}
+
+.headshot-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: $card;
+  border: 2px dashed rgba($naranja, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: $transicion;
+
+  &:active {
+    border-color: $naranja;
+    transform: scale(0.97);
+  }
+}
+
+.headshot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.headshot-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  .headshot-add-icon {
+    font-size: 1.8rem;
+    color: rgba($naranja, 0.6);
+  }
+
+  .headshot-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba($naranja, 0.6);
+  }
+}
+
+.headshot-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 1.5rem;
+    color: $blanco;
+  }
+}
+
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: $gris;
+  text-transform: uppercase;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-half {
+  flex: 1;
+}
+
+.field-wrap {
+  background: $card;
+  border: 1px solid $borde;
+  border-radius: 10px;
+  padding: 13px 14px;
+  transition: $transicion;
+
+  &.focused {
+    border-color: $naranja;
+    box-shadow: 0 0 0 3px rgba($naranja, 0.1);
+  }
+
+  &.textarea-wrap {
+    padding: 12px 14px;
+  }
+
+  &.select-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    height: 48px;
+  }
+}
+
+.field-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+
+  &::placeholder { color: #444; }
+
+  &.field-textarea {
+    resize: none;
+  }
+}
+
+.field-select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $blanco;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+
+  option {
+    background: #1a1a1a;
+    color: $blanco;
+  }
+}
+
+.select-arrow {
+  font-size: 0.9rem;
+  color: $gris;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+
+.setup-footer {
+  --background: #{$fondo};
+  border-top: 1px solid $borde;
+}
+
+.footer-content {
+  padding: 12px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: $rojo;
+  font-size: 0.82rem;
+  margin: 0;
+  animation: fadeIn 0.2s ease-out;
+
+  ion-icon { font-size: 1rem; flex-shrink: 0; }
+}
+
+.btn-next {
+  width: 100%;
+  background: $naranja;
+  color: $blanco;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: $transicion;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:active { transform: scale(0.98); }
+  &:disabled { background: #2a2a2a; color: #555; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

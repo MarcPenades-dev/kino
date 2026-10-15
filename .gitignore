@@ -1,0 +1,26 @@
+# Dependencias y compilados
+node_modules/
+dist/
+www/
+.angular/
+
+# Variables de entorno (nunca se suben)
+.env
+.env.*
+!.env.example
+
+# Archivos subidos por los usuarios en local
+kino-api/uploads/*
+!kino-api/uploads/.gitkeep
+
+# Proyecto nativo generado por Capacitor
+kino-app/android/
+kino-app/ios/
+
+# IDEs
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db

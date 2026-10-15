@@ -1,0 +1,203 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-titulo">Editar Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="guardar()" [disabled]="guardando">
+        <span class="btn-save-text">Guardar</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="edit-content">
+
+  <!-- FOTO -->
+  <div class="foto-section">
+    <div class="foto-circle" (click)="cambiarFoto()">
+      <img *ngIf="fotoPreview" [src]="fotoPreview" class="foto-img" />
+      <div *ngIf="!fotoPreview" class="foto-inicial">{{ getInitial() }}</div>
+      <div class="foto-overlay">
+        <ion-icon name="camera-outline"></ion-icon>
+      </div>
+    </div>
+    <button class="btn-change-foto" (click)="cambiarFoto()">Cambiar Foto de Perfil</button>
+    <input
+      type="file"
+      #fileInput
+      accept="image/*"
+      style="display:none"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <div class="form-container">
+
+
+    <div class="form-section-title">Información Básica</div>
+
+    <div class="field-group">
+      <label class="field-label">Nombre Completo</label>
+      <div class="field-wrap">
+        <input type="text" [(ngModel)]="form.nombre"
+               placeholder="Avery Santos" class="field-input" />
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group field-half">
+        <label class="field-label">Edad</label>
+        <div class="field-wrap">
+          <input type="number" [(ngModel)]="form.edad"
+                 placeholder="28" class="field-input" min="16" max="99" />
+        </div>
+      </div>
+      <div class="field-group field-half">
+        <label class="field-label">Altura (Opcional)</label>
+        <div class="field-wrap">
+          <input type="text" [(ngModel)]="form.altura"
+                 placeholder="ej: 170cm" class="field-input" />
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Ubicación</label>
+      <div class="field-wrap">
+        <ion-icon name="location-outline" class="field-icon"></ion-icon>
+        <input type="text" [(ngModel)]="form.ciudad"
+               placeholder="Barcelona, Madrid..." class="field-input" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Idiomas (separados por coma)</label>
+      <div class="field-wrap">
+        <input type="text" [(ngModel)]="form.idiomas"
+               placeholder="Español, Inglés" class="field-input" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Estado Sindical</label>
+      <div class="field-wrap select-wrap">
+        <select [(ngModel)]="form.unionStatus" class="field-select">
+          <option value="">Selecciona estado</option>
+          <option value="Union">Sindicado</option>
+          <option value="Non-Union">No Sindicado</option>
+          <option value="Fi-Core">Fi-Core</option>
+        </select>
+        <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+      </div>
+    </div>
+
+    <!-- PROFESSIONAL BIO -->
+    <div class="form-section-title">Biografía Profesional</div>
+
+    <div class="field-group">
+      <div class="field-label-row">
+        <label class="field-label">Bio</label>
+        <span class="char-counter">{{ form.bio?.length || 0 }}/300</span>
+      </div>
+      <div class="field-wrap textarea-wrap">
+        <textarea
+          [(ngModel)]="form.bio"
+          placeholder="Escribe aquí tu trayectoria y experiencia profesional..."
+          class="field-input field-textarea"
+          rows="5"
+          maxlength="300"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- INTERESTED GENRES -->
+    <div class="form-section-title">
+      Géneros de Interés
+      <span class="section-hint">Selecciona hasta 8</span>
+    </div>
+
+    <div class="generos-grid">
+      <div
+        class="genero-chip"
+        *ngFor="let g of generosDisponibles"
+        [class.activo]="form.generos.includes(g)"
+        (click)="toggleGenero(g)"
+      >{{ g }}</div>
+      <div class="genero-chip add-chip" (click)="agregarGenero()">
+        <ion-icon name="add-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO & MEDIA -->
+    <div class="form-section-title">
+      Portfolio y Media
+      <button class="btn-add-media" (click)="agregarMedia()">
+        <ion-icon name="add-outline"></ion-icon> Añadir Media
+      </button>
+    </div>
+
+    <div class="portfolio-lista" *ngIf="form.portfolio.length > 0">
+      <div class="portfolio-item" *ngFor="let item of form.portfolio; let i = index">
+        <div class="portfolio-item-icon" [class]="item.tipo">
+          <ion-icon [name]="item.tipo === 'video' ? 'play-outline' :
+                            item.tipo === 'link' ? 'link-outline' : 'image-outline'">
+          </ion-icon>
+        </div>
+        <div class="portfolio-item-info">
+          <span class="portfolio-item-titulo">{{ item.titulo || item.url }}</span>
+          <span class="portfolio-item-tipo">{{ item.tipo | titlecase }}</span>
+        </div>
+        <div class="portfolio-item-actions">
+          <button class="btn-portfolio-action" (click)="quitarMedia(i)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="portfolio-empty-hint" *ngIf="form.portfolio.length === 0">
+      <ion-icon name="film-outline"></ion-icon>
+      <span>Añade reels, fotos o enlaces para mostrar tu trabajo</span>
+    </div>
+
+    <!-- EXTERNAL LINKS -->
+    <div class="form-section-title">Enlaces Externos</div>
+
+    <div class="links-lista">
+      <div class="link-item" *ngFor="let link of form.links; let i = index">
+        <ion-icon name="link-outline" class="link-icon"></ion-icon>
+        <input
+          type="url"
+          [(ngModel)]="form.links[i]"
+          placeholder="https://imdb.com/..."
+          class="field-input link-input"
+        />
+        <button class="btn-quitar-link" (click)="quitarLink(i)">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-add-link" (click)="agregarLink()">
+      <ion-icon name="add-outline"></ion-icon>
+      Añadir IMDb, YouTube, etc.
+    </button>
+
+  </div>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<!-- FOOTER -->
+<ion-footer class="ion-no-border edit-footer">
+  <div class="footer-content">
+    <button class="btn-save-changes" (click)="guardar()" [disabled]="guardando">
+      <ion-spinner *ngIf="guardando" name="crescent" color="light"></ion-spinner>
+      <span *ngIf="!guardando">Guardar Cambios</span>
+    </button>
+  </div>
+</ion-footer>
